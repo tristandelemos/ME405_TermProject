@@ -1,2 +1,2 @@
 # ME405_TermProject
-ME405 Mechatronics Term Project
+Created by Tristan de Lemos, Trenten Spicer, Rees Verleur
