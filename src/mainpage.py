@@ -11,3 +11,13 @@
   etc
  
 """
+
+class dontworry:
+    
+    """!
+    @brief	just says hello
+    @details	hello
+    """
+    
+    def hello:
+        print("hello")
