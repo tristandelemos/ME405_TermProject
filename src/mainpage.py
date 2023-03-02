@@ -1,23 +1,19 @@
 """! \mainpage My Personal Index Page
  
-  @section Software_Design Introduction
+  @section Software_Design State Machine
  
-  This is the introduction.
- 
+    Here is our State Machine Design
+    \image html State_Diagram.png
   
  
-  @subsection State Machine Step 1: Opening the box
+  @subsection Motor State 
  
-  etc
+      Here is our Motor FSM
+      \image html motor_task.png
+  
  
+ @subsection Picture State 
+ 
+      Here is our Image FSM
+      \image html picture_task.png
 """
-
-class dontworry:
-    
-    """!
-    @brief	just says hello
-    @details	hello
-    """
-    
-    def hello:
-        print("hello")

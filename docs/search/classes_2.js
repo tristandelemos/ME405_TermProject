@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['mlx_5fcam_0',['MLX_Cam',['../classmlx__cam_1_1_m_l_x___cam.html',1,'mlx_cam']]],
-  ['motordriver_1',['MotorDriver',['../classmotor__driver_1_1_motor_driver.html',1,'motor_driver']]]
+  ['pidcontrol_0',['PidControl',['../classpid__control_1_1_pid_control.html',1,'pid_control']]],
+  ['procontrol_1',['ProControl',['../classpro__control_1_1_pro_control.html',1,'pro_control']]]
 ];
