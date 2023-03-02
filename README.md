@@ -3,4 +3,4 @@ Created by Tristan de Lemos, Trenten Spicer, Rees Verleur
 
 Shown below is the FSM for our system.
 
-![alt text](State Diagram.png)
+![alt text](State_Diagram.png)
