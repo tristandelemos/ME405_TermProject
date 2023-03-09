@@ -81,8 +81,6 @@ def take_picture(camera):
             break
 
 
-
-
 def main():
     camera = 0
     
@@ -105,7 +103,7 @@ def main():
         
             # Move motors to desired angles
             if(state == S2_MOVE_MOTORS):
-            
+                move_motors();
                 state = S3_SHOOT
             
             
@@ -131,17 +129,18 @@ if __name__ == "__main__":
             so that their values can be accessed and changed by any function.
     """
     gc.collect()
-    # Initialize uart communication
-    u2 = pyb.UART(2, baudrate=115200, timeout = 65383)
+    
     # Initialize encoder objects
-    enc_1 = EncoderDriver(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
-    enc_2 = EncoderDriver(pyb.Pin.board.PC6, pyb.Pin.board.PC7, 8)
+    enc_yaw = EncoderDriver(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+    enc_pitch = EncoderDriver(pyb.Pin.board.PC6, pyb.Pin.board.PC7, 8)
     # Initialize motor objects
-    motor_1 = MotorDriver (pyb.Pin.board.PA10,pyb.Pin.board.PB4,pyb.Pin.board.PB5,3)
-    motor_2 = MotorDriver (pyb.Pin.board.PC1,pyb.Pin.board.PA0,pyb.Pin.board.PA1,5)
+    motor_yaw = MotorDriver (pyb.Pin.board.PA10,pyb.Pin.board.PB4,pyb.Pin.board.PB5,3)
+    motor_pitch = MotorDriver (pyb.Pin.board.PC1,pyb.Pin.board.PA0,pyb.Pin.board.PA1,5)
     # Initialize proportional controllers with default values
-    con_1 = ProControl()
-    con_2 = ProControl()
+    con_yaw = ProControl()
+    con_pitch = ProControl()
+    
+    
     # Intitialize camera
     try:
         from pyb import info
@@ -163,3 +162,22 @@ if __name__ == "__main__":
     gc.collect()
     # Create the camera object and set it up in default mode
     camera = MLX_Cam(i2c_bus)
+    
+    
+    
+    # Create the tasks. If trace is enabled for any task, memory will be
+    # allocated for state transition tracing, and the application will run out
+    # of memory after a while and quit. Therefore, use tracing only for 
+    # debugging and set trace to False when it's not needed
+    task1 = cotask.Task(task1_yaw_motor, name="Task_1", priority=1, period=20,
+                        profile=False, trace=False)
+    task2 = cotask.Task(task2_pitch_motor, name="Task_2", priority=1, period=20,
+                        profile=False, trace=False)
+    cotask.task_list.append(task1)
+    cotask.task_list.append(task2)
+
+    # Run the memory garbage collector to ensure memory is as defragmented as
+    # possible before the real-time scheduler is started
+    gc.collect()
+    
+    main()
