@@ -18,7 +18,9 @@ example.
 @copyright (c) 2022 by the authors and released under the GNU Public License,
     version 3.
 """
-import scipy
+#import scipy
+import gc
+from array import array
 import utime as time
 from machine import Pin, I2C
 from mlx90640 import MLX90640
@@ -181,6 +183,55 @@ class MLX_Cam:
             image = self._camera.process_image(subpage, state)
 
         return image
+    
+
+
+def calculate_centroid(camera, image):
+    """!
+    @brief   Calculates centroid from image
+    @details Loops through csv formatted image, takes high values and calculates
+             the centroid from it. csv_image would optimally be pre-filtered to
+             eliminate outliers
+    @param   csv_image The thermal image file in csv format
+    @returns A tuple of x, y values of the centroid position"""
+    # image = csv_image
+
+    # x_list = []
+    # y_list = []
+
+    x_array = bytearray(b'\x00')
+
+    x_array = array("i")
+    y_array = array("i")
+
+    y = 24
+    num = 0
+
+    for line in camera.get_csv(image.v_ir, limits=(0, 99)):
+        line_list = line.split(",")
+        for i in range(len(line_list)):
+            if int(line_list[i]) >= 50:
+                # x_list.append(i)
+                # y_list.append(y)
+                x_array.append(i)
+                y_array.append(y)
+                num += 1
+        y -= 1
+        
+    x_sum = sum(x_array)
+    del x_array
+    
+    y_sum = sum(y_array)
+    del y_array
+
+    if num > 0:
+        centroid_x = x_sum/num
+        centroid_y = y_sum/num
+    else:
+        return -1, -1
+
+    return centroid_x, centroid_y
+
 
 
 # The test code sets up the sensor, then grabs and shows an image in a terminal
@@ -190,6 +241,11 @@ if __name__ == "__main__":
 
     # The following import is only used to check if we have an STM32 board such
     # as a Pyboard or Nucleo; if not, use a different library
+    gc.collect()
+
+    print(f"free memory: {gc.mem_free()}")
+    print(f"used memory: {gc.mem_alloc()}")
+    
     try:
         from pyb import info
 
@@ -219,48 +275,80 @@ if __name__ == "__main__":
             begintime = time.ticks_ms()
             image = camera.get_image()
             print(f" {time.ticks_diff(time.ticks_ms(), begintime)} ms")
+            del begintime
+
+            new_start = time.ticks_ms()
 
             # Can show image.v_ir, image.alpha, or image.buf; image.v_ir best?
             # Display pixellated grayscale or numbers in CSV format; the CSV
             # could also be written to a file. Spreadsheets, Matlab(tm), or
             # CPython can read CSV and make a decent false-color heat plot.
-            cleared_image = [];
+            # cleared_image = []
             show_image = False
             show_csv = False
             if show_image:
                 camera.ascii_image(image.buf)
             elif show_csv:
                 for line in camera.get_csv(image.v_ir, limits=(0, 99)):
-                    cleared_image.append(line)
+                    # cleared_image.append(line)
                     print(line)
             else:
-                camera.ascii_art(image.v_ir)
+                # camera.ascii_art(image.v_ir)
+                pass
                 
-                for line in camera.get_csv(image.v_ir, limits=(0, 99)):
-                    cleared_image.append(line)
-                    time.sleep_ms(1)
+                # for line in camera.get_csv(image.v_ir, limits=(0, 99)):
+                #     cleared_image.append(line)
+                    # time.sleep_ms(1)
+
+            print_time = time.ticks_ms()
                     
             # time.sleep_ms(5000)
             print()
             
-            cleared_image.reverse()
-            for line in cleared_image:
-                linelist = line.split(",")
-                newline = ""
-                for i in range(len(linelist)):
-                    #print(f"line[i]: {line[i]}")
-                    if (int(linelist[i]) < 40):
-                        linelist[i] = "0"
-                        newline += "--"
-                    elif (int(linelist[i]) < 50):
-                        newline += "++"
-                    else:
-                        newline += "&&"
+            # cleared_image.reverse()
+            # y = 24
+            # for line in cleared_image:
+            #     linelist = line.split(",")
+            #     newline = ""
+            #     for i in range(len(linelist)):
+            #         #print(f"line[i]: {line[i]}")
+            #         if (int(linelist[i]) < 40):
+            #             linelist[i] = "0"
+            #             newline += "--"
+            #         elif (int(linelist[i]) < 50):
+            #             newline += "++"
+            #         else:
+            #             newline += "&&"
                         
-                # newline = ",".join(linelist)
-                print(newline)                
+            #     # newline = ",".join(linelist)
+            #     if y > 9:
+            #         print(y, newline)
+            #     else:
+            #         print(y, " " + newline)
+            #     y -= 1
+
+            # print(y, " 0102030405060708091011121314151617181920212223242526272829303132")
             
-            time.sleep_ms(5000)
+            my_print_time = time.ticks_ms()
+
+            # c_x, c_y = calculate_centroid(cleared_image)
+            c_x, c_y = calculate_centroid(camera, image)
+
+            centroid_time = time.ticks_ms()
+
+            print(f"initial print time: {time.ticks_diff(print_time, new_start)}")
+            print(f"second print time: {time.ticks_diff(my_print_time, print_time)}")
+            print(f"centroid calc time: {time.ticks_diff(centroid_time, my_print_time)}")
+            print(f"total post-snap time: {time.ticks_diff(centroid_time, new_start)}")
+
+            print(f"\nCentroid: {c_x}, {c_y}")
+            
+            cont = input("continue? y or n ")
+            if cont == "n":
+                break
+            else:
+                time.sleep_ms(1000)
+            # time.sleep_ms(5000)
 
         except KeyboardInterrupt:
             break
@@ -268,5 +356,3 @@ if __name__ == "__main__":
     print ("Done.")
 
 ## @endcond End the block which Doxygen should ignore
-
-
