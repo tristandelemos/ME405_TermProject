@@ -234,6 +234,57 @@ def calculate_centroid(camera, image):
 
 
 
+def calculate_centroid_bytes(image_array, scalar=0.8):
+    """!
+    @brief   Calculates centroid from bytearray of points in image
+    @details 
+    @param   image_array A bytearray of image values in order starting at top left pixel
+             Lines are 32 long, there are 24 lines total
+    @param   scalar A float value from (0 to 1) used to determine how high the image values need to be to be
+             considered a target
+    @returns A tuple of x, y values of the centroid position"""
+
+    x_array = bytearray()
+    y_array = bytearray()
+
+    x_val = 1
+    y_val = 24
+
+    num = 0
+
+    # for byte in image_array:
+    for i in range(len(image_array)):
+        # if x_val == 33:
+        #     x_val = 0
+        #     y_val -= 1
+        # if y_val == 0:
+        #     print("shouldn't get here")
+        #     break
+
+        byte = image_array[i]
+
+        x_val = i%32 + 1
+        y_val = 24 - i//32
+
+        if byte > b(255 * scalar):
+            x_array.append(x_val)
+            y_array.append(y_val)
+            num += 1
+
+    x_sum = sum(x_array)
+    y_sum = sum(y_array)
+
+    cent_x = x_sum/num
+    cent_y = y_sum/num
+
+    return cent_x, cent_y
+
+
+
+        
+
+
+
 # The test code sets up the sensor, then grabs and shows an image in a terminal
 # every ten and a half seconds or so.
 ## @cond NO_DOXY don't document the test code in the driver documentation
