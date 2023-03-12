@@ -24,6 +24,8 @@ example.
     version 3.
 """
 
+import gc
+from array import array
 import utime as time
 from machine import Pin, I2C
 from mlx90640 import MLX90640
@@ -37,7 +39,7 @@ class MLX_Cam:
              make it easier to grab and use an image.
     """
 
-    def __init__(self, i2c, address=0x33, pattern=ChessPattern,
+    def __init__(self, i2c, address=0x33, pattern=InterleavedPattern,
                  width=NUM_COLS, height=NUM_ROWS):
         """!
         @brief   Set up an MLX90640 camera.
@@ -67,76 +69,6 @@ class MLX_Cam:
 
         ## A local reference to the image object within the camera driver
         self._image = self._camera.raw
-
-
-    def ascii_image(self, array, pixel="██", textcolor="0;180;0"):
-        """!
-        @brief   Show low-resolution camera data as shaded pixels on a text
-                 screen.
-        @details The data is printed as a set of characters in columns for the
-                 number of rows in the camera's image size. This function is
-                 intended for testing an MLX90640 thermal infrared sensor.
-
-                 A pair of extended ACSII filled rectangles is used by default
-                 to show each pixel so that the aspect ratio of the display on
-                 screens isn't too smushed. Each pixel is colored using ANSI
-                 terminal escape codes which work in only some programs such as
-                 PuTTY.  If shown in simpler terminal programs such as the one
-                 used in Thonny, the display just shows a bunch of pixel
-                 symbols with no difference in shading (boring).
-
-                 A simple auto-brightness scaling is done, setting the lowest
-                 brightness of a filled block to 0 and the highest to 255. If
-                 there are bad pixels, this can reduce contrast in the rest of
-                 the image.
-
-                 After the printing is done, character color is reset to a
-                 default of medium-brightness green, or something else if
-                 chosen.
-        @param   array An array of (self._width * self._height) pixel values
-        @param   pixel Text which is shown for each pixel, default being a pair
-                 of extended-ASCII blocks (code 219)
-        @param   textcolor The color to which printed text is reset when the
-                 image has been finished, as a string "<r>;<g>;<b>" with each
-                 letter representing the intensity of red, green, and blue from
-                 0 to 255
-        """
-        minny = min(array)
-        scale = 255.0 / (max(array) - minny)
-        for row in range(self._height):
-            for col in range(self._width):
-                pix = int((array[row * self._width + (self._width - col - 1)]
-                           - minny) * scale)
-                print(f"\033[38;2;{pix};{pix};{pix}m{pixel}", end='')
-            print(f"\033[38;2;{textcolor}m")
-
-
-    ## A "standard" set of characters of different densities to make ASCII art
-    asc = " -.:=+*#%@"
-
-
-    def ascii_art(self, array):
-        """!
-        @brief   Show a data array from the IR image as ASCII art.
-        @details Each character is repeated twice so the image isn't squished
-                 laterally. A code of "><" indicates an error, probably caused
-                 by a bad pixel in the camera. 
-        @param   array The array to be shown, probably @c image.v_ir
-        """
-        scale = len(MLX_Cam.asc) / (max(array) - min(array))
-        offset = -min(array)
-        for row in range(self._height):
-            line = ""
-            for col in range(self._width):
-                pix = int((array[row * self._width + (self._width - col - 1)]
-                           + offset) * scale)
-                try:
-                    the_char = MLX_Cam.asc[pix]
-                    print(f"{the_char}{the_char}", end='')
-                except IndexError:
-                    print("><", end='')
-            print('')
-        return
 
 
     def get_csv(self, array, limits=None):
@@ -212,6 +144,119 @@ class MLX_Cam:
         return image
 
 
+def calculate_centroid(camera, image):
+    """!
+    @brief   Calculates centroid from image
+    @details Loops through csv formatted image, takes high values and calculates
+             the centroid from it. csv_image would optimally be pre-filtered to
+             eliminate outliers
+    @param   csv_image The thermal image file in csv format
+    @returns A tuple of x, y values of the centroid position"""
+    # image = csv_image
+
+    # x_list = []
+    # y_list = []
+
+    #x_array = bytearray(b'\x00')
+
+    x_array = array("B")
+    y_array = array("B")
+
+    y = 24
+    num = 0
+
+    for line in camera.get_csv(image, limits=(0, 99)):
+        line_list = line.split(",")
+        for i in range(len(line_list)):
+            if int(line_list[i]) >= 50:
+                # x_list.append(i)
+                # y_list.append(y)
+                x_array.append(i)
+                y_array.append(y)
+                #x_array[num] = i
+                #y_array[num] = y
+                num += 1
+                
+        y -= 1
+        
+    x_sum = sum(x_array)
+    del x_array
+    
+    y_sum = sum(y_array)
+    del y_array
+
+    if num > 0:
+        centroid_x = x_sum/num
+        centroid_y = y_sum/num
+    else:
+        return -1, -1
+
+    return centroid_x, centroid_y
+
+
+
+def calculate_centroid_bytes(ref_array, image_array, upper=99, scalar=0.8):
+    """!
+    @brief   Calculates centroid from bytearray of points in image
+    @details 
+    @param   image_array A bytearray of image values in order starting at top left pixel
+             Lines are 32 long, there are 24 lines total
+    @param   scalar A float value from (0 to 1) used to determine how high the image values need to be to be
+             considered a target
+    @returns A tuple of x, y values of the centroid position"""
+
+    x_array = bytearray()
+    y_array = bytearray()
+
+    x_val = 1
+    y_val = 24
+
+    num = 0
+
+    # for byte in image_array:
+    for i in range(len(image_array)):
+        # if x_val == 33:
+        #     x_val = 0
+        #     y_val -= 1
+        # if y_val == 0:
+        #     print("shouldn't get here")
+        #     break
+
+        byte = image_array[i] - ref_array[i]
+        #print(byte)
+        if byte < 0:
+            byte = 0
+
+        x_val = i%32 + 1
+        y_val = 24 - i//32
+        
+        if byte > (upper * scalar):
+            #print(byte)
+            x_array.append(x_val)
+            y_array.append(y_val)
+            num += 1
+            
+
+
+    x_sum = sum(x_array)
+    y_sum = sum(y_array)
+
+    print("num", num)
+
+    if num > 0:
+        cent_x = x_sum/num
+        cent_y = y_sum/num
+    else:
+        return -1, -1
+    
+    return cent_x, cent_y
+
+
+
+        
+
+
+
 # The test code sets up the sensor, then grabs and shows an image in a terminal
 # every ten and a half seconds or so.
 ## @cond NO_DOXY don't document the test code in the driver documentation
@@ -219,6 +264,11 @@ if __name__ == "__main__":
 
     # The following import is only used to check if we have an STM32 board such
     # as a Pyboard or Nucleo; if not, use a different library
+    gc.collect()
+
+    print(f"free memory: {gc.mem_free()}")
+    print(f"used memory: {gc.mem_alloc()}")
+    
     try:
         from pyb import info
 
@@ -240,6 +290,9 @@ if __name__ == "__main__":
 
     # Create the camera object and set it up in default mode
     camera = MLX_Cam(i2c_bus)
+    
+    ref = camera.get_image()
+    ref_array = camera.get_bytes(ref, (0, 99))
 
     while True:
         try:
@@ -248,24 +301,93 @@ if __name__ == "__main__":
             begintime = time.ticks_ms()
             image = camera.get_image()
             print(f" {time.ticks_diff(time.ticks_ms(), begintime)} ms")
+            del begintime
+
+            new_start = time.ticks_ms()
 
             # Can show image.v_ir, image.alpha, or image.buf; image.v_ir best?
             # Display pixellated grayscale or numbers in CSV format; the CSV
             # could also be written to a file. Spreadsheets, Matlab(tm), or
             # CPython can read CSV and make a decent false-color heat plot.
+            # cleared_image = []
             show_image = False
             show_csv = False
-            show_bytes = True
             if show_image:
-                camera.ascii_image(image)
+                camera.ascii_image(image.buf)
             elif show_csv:
                 for line in camera.get_csv(image, limits=(0, 99)):
+                    # cleared_image.append(line)
                     print(line)
             else:
-                arr = camera.get_bytes(image,limits = (0,255))
-                print(arr)
-    
-            time.sleep_ms(10000)
+                # camera.ascii_art(image.v_ir)
+                pass
+                
+                # for line in camera.get_csv(image.v_ir, limits=(0, 99)):
+                #     cleared_image.append(line)
+                    # time.sleep_ms(1)
+
+            print_time = time.ticks_ms()
+                    
+            # time.sleep_ms(5000)
+            print()
+            
+            # cleared_image.reverse()
+            # y = 24
+            # for line in cleared_image:
+            #     linelist = line.split(",")
+            #     newline = ""
+            #     for i in range(len(linelist)):
+            #         #print(f"line[i]: {line[i]}")
+            #         if (int(linelist[i]) < 40):
+            #             linelist[i] = "0"
+            #             newline += "--"
+            #         elif (int(linelist[i]) < 50):
+            #             newline += "++"
+            #         else:
+            #             newline += "&&"
+                        
+            #     # newline = ",".join(linelist)
+            #     if y > 9:
+            #         print(y, newline)
+            #     else:
+            #         print(y, " " + newline)
+            #     y -= 1
+
+            # print(y, " 0102030405060708091011121314151617181920212223242526272829303132")
+            
+            my_print_time = time.ticks_ms()
+
+            # c_x, c_y = calculate_centroid(cleared_image)
+            c_x, c_y = calculate_centroid(camera, image)
+
+            centroid_time = time.ticks_ms()
+
+            second_start = time.ticks_ms()
+            image_array = camera.get_bytes(image, limits = (0, 99))
+            getbytestime = time.ticks_ms()
+            c_x2, c_y2 = calculate_centroid_bytes(ref_array, image_array, upper=99, scalar=0.3)
+            cbytestime = time.ticks_ms()
+            
+
+
+            #print(f"initial print time: {time.ticks_diff(print_time, new_start)}")
+            #print(f"second print time: {time.ticks_diff(my_print_time, print_time)}")
+            #print(f"centroid calc time: {time.ticks_diff(centroid_time, my_print_time)}")
+            #print(f"total post-snap time: {time.ticks_diff(centroid_time, new_start)}")
+            
+            
+            print(f"get bytes time: {time.ticks_diff(getbytestime, second_start)}")
+            print(f"centroid 2 time: {time.ticks_diff(cbytestime, getbytestime)}")
+
+            print(f"\nCentroid: {c_x}, {c_y}")
+            print(f"\nCentroid2: {c_x2}, {c_y2}")
+            
+            cont = input("continue? y or n ")
+            if cont == "n":
+                break
+            else:
+                time.sleep_ms(1000)
+            # time.sleep_ms(5000)
 
         except KeyboardInterrupt:
             break
@@ -273,4 +395,3 @@ if __name__ == "__main__":
     print ("Done.")
 
 ## @endcond End the block which Doxygen should ignore
-
