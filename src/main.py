@@ -9,13 +9,12 @@ import task_share
 import gc
 import mlx_cam_mod
 import servo
+import pyb
 from machine import Pin, I2C
 from encoder_driver import EncoderDriver
 from motor_driver import MotorDriver
 from pro_control import ProControl
-from mlx90640 import MLX90640
-from mlx90640.calibration import NUM_ROWS, NUM_COLS, IMAGE_SIZE, TEMP_K
-from mlx90640.image import ChessPattern, InterleavedPattern
+
 
 S0_INIT = 0
 S1_TAKE_PICTURE = 1
@@ -100,6 +99,7 @@ def move_motors(x, y):
     @ param	y The point to move the pitch axis motor to move to.
     @return	
     """
+    # add functionality that converts the x and y to motor values
     pass
     
 def shoot():
