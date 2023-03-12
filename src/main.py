@@ -7,6 +7,8 @@ import utime
 import cotask
 import task_share
 import gc
+import mlx_cam_mod
+import servo
 from machine import Pin, I2C
 from encoder_driver import EncoderDriver
 from motor_driver import MotorDriver
@@ -22,12 +24,32 @@ S3_SHOOT = 3
 S4_PAUSE = 4
 
 
-def initialize():
-    pass
-
-
 def take_picture(camera):
+    """!
+    @brief	Take a picture from the camera and find the centroid of the largest heat signature.
+    @param	Camera Object created by MLX_Cam()
+    @return	Array of x and y points for the turret to point.
+    """
+    image = get_image()
+    
+    
+def move_motors(x, y):
+    """!
+    @brief	Take a picture from the camera and find the centroid of the largest heat signature.
+    @param	x The point to move the yaw axis motor to move to.
+    @ param	y The point to move the pitch axis motor to move to.
+    @return	
+    """
     pass
+    
+def shoot():
+    """!
+    @brief	Fires the turret by moving the servo to set positions.
+    @return	
+    """
+    ser.set_pos(20)
+    utime.sleepms(50)
+    ser.set_pos(0)
 
 
 def main():
@@ -72,9 +94,9 @@ def main():
             break 
     
 if __name__ == "__main__":
-    """!@brief This script creates instances of all the required modules and
+    """!@brief	This script creates instances of all the required modules and
             calls the test program in main()
-        @details The classes have to be instantiated here outside of functions
+        @details	The classes have to be instantiated here outside of functions
             so that their values can be accessed and changed by any function.
     """
     gc.collect()
@@ -104,7 +126,6 @@ if __name__ == "__main__":
         i2c_bus = I2C(1)
 
     
-    
     i2c_address = 0x33
     scanhex = [f"0x{addr:X}" for addr in i2c_bus.scan()]
     print(f"I2C Scan: {scanhex}")
@@ -124,6 +145,9 @@ if __name__ == "__main__":
                         profile=False, trace=False)
     cotask.task_list.append(task1)
     cotask.task_list.append(task2)
+    
+    # Create  servo object for firing
+    ser = Servo(pyb.Pin.board.PB10,2,3)
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started
