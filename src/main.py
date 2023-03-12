@@ -23,6 +23,64 @@ S2_MOVE_MOTORS = 2
 S3_SHOOT = 3
 S4_PAUSE = 4
 
+def task1_yaw_motor():
+    """!@brief Task which runs the proportional controller to control the yaw motor.
+
+    """
+    # Read encoder to get an initial value
+    read_yaw = enc_yaw.read()
+    # Zero the position so that the step response moves a known amount
+    pos_yaw = 0
+    # Record the start time for later use
+    start_yaw = utime.ticks_ms()
+    
+    
+    while True:
+        # Update the read and postion values
+        read_yaw,pos_yaw = enc_yaw.update(read_yaw,pos_yaw)
+    
+        # Calculate effort with pos and neg limits
+        effort_yaw = con_yaw.run(pos_yaw)
+        if effort_yaw<-100:
+            effort_yaw = -100
+        elif effort_yaw>100:
+            effort_yaw = 100
+            
+        # Set the motor duty cycle
+        motor_yaw.set_duty_cycle(effort_yaw)
+        # Yield and come back at top of while loop in next call
+        yield
+        
+        
+def task1_pitch_motor():
+    """!@brief Task which runs the proportional controller to control the pitch motor.
+
+    """
+    # Read encoder to get an initial value
+    read_pitch = enc_pitch.read()
+    # Zero the position so that the step response moves a known amount
+    pos_pitch = 0
+    # Record the start time for later use
+    start_pitch = utime.ticks_ms()
+    
+    
+    while True:
+        # Update the read and postion values
+        read_pitch,pos_pitch = enc_pitch.update(read_pitch,pos_pitch)
+    
+        # Calculate effort with pos and neg limits
+        effort_pitch = con_pitch.run(pos_pitch)
+        if effort_pitch<-100:
+            effort_pitch = -100
+        elif effort_pitch>100:
+            effort_pitch = 100
+            
+        # Set the motor duty cycle
+        motor_pitch.set_duty_cycle(effort_pitch)
+        # Yield and come back at top of while loop in next call
+        yield
+
+
 
 def take_picture(camera):
     """!
@@ -31,6 +89,8 @@ def take_picture(camera):
     @return	Array of x and y points for the turret to point.
     """
     image = get_image()
+    
+    # find centroid
     
     
 def move_motors(x, y):
@@ -74,12 +134,13 @@ def main():
         
             # Move motors to desired angles
             if(state == S2_MOVE_MOTORS):
-                move_motors();
+                move_motors()
                 state = S3_SHOOT
             
             
             # activate servo to shoot
             if(state == S3_SHOOT):
+                shoot()
     
                 state = S4_PAUSE
        
