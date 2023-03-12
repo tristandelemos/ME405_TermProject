@@ -27,58 +27,7 @@ def initialize():
 
 
 def take_picture(camera):
-    while True:
-        try:
-            # Get and image and see how long it takes to grab that image
-            print("Click.", end='')
-            begintime = time.ticks_ms()
-            image = camera.get_image()
-            print(f" {time.ticks_diff(time.ticks_ms(), begintime)} ms")
-
-            # Can show image.v_ir, image.alpha, or image.buf; image.v_ir best?
-            # Display pixellated grayscale or numbers in CSV format; the CSV
-            # could also be written to a file. Spreadsheets, Matlab(tm), or
-            # CPython can read CSV and make a decent false-color heat plot.
-            cleared_image = [];
-            show_image = False
-            show_csv = False
-            if show_image:
-                camera.ascii_image(image.buf)
-            elif show_csv:
-                for line in camera.get_csv(image.v_ir, limits=(0, 99)):
-                    cleared_image.append(line)
-                    print(line)
-            else:
-                camera.ascii_art(image.v_ir)
-                
-                for line in camera.get_csv(image.v_ir, limits=(0, 99)):
-                    cleared_image.append(line)
-                    time.sleep_ms(1)
-                    
-            # time.sleep_ms(5000)
-            print()
-            
-            cleared_image.reverse()
-            for line in cleared_image:
-                linelist = line.split(",")
-                newline = ""
-                for i in range(len(linelist)):
-                    #print(f"line[i]: {line[i]}")
-                    if (int(linelist[i]) < 40):
-                        linelist[i] = "0"
-                        newline += "--"
-                    elif (int(linelist[i]) < 50):
-                        newline += "++"
-                    else:
-                        newline += "&&"
-                        
-                # newline = ",".join(linelist)
-                print(newline)                
-            
-            time.sleep_ms(5000)
-
-        except KeyboardInterrupt:
-            break
+    pass
 
 
 def main():
