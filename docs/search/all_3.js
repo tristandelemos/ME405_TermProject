@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['get_5fcsv_0',['get_csv',['../classmlx__cam_1_1_m_l_x___cam.html#ae2adf74abddcae23d14424f52548359f',1,'mlx_cam::MLX_Cam']]],
-  ['get_5fimage_1',['get_image',['../classmlx__cam_1_1_m_l_x___cam.html#a8bb72d68883cd21e0b3d9559c9faa1dd',1,'mlx_cam::MLX_Cam']]]
+  ['calculate_5fcentroid_0',['calculate_centroid',['../mlx__cam_8py.html#a4e7cc7aabe8358e110f15def15e41a15',1,'mlx_cam']]],
+  ['calculate_5fcentroid_5fbytes_1',['calculate_centroid_bytes',['../mlx__cam_8py.html#ad552dbb8bae05f2202ace92c917036cf',1,'mlx_cam']]],
+  ['clear_2',['clear',['../classtask__share_1_1_queue.html#aeac8766461d55d5717dd79fede402007',1,'task_share::Queue']]],
+  ['cotask_2epy_3',['cotask.py',['../cotask_8py.html',1,'']]]
 ];
