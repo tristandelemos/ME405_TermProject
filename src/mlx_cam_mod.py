@@ -37,7 +37,7 @@ class MLX_Cam:
              make it easier to grab and use an image.
     """
 
-    def __init__(self, i2c, address=0x33, pattern=ChessPattern,
+    def __init__(self, i2c, address=0x33, pattern=InterleavedPattern,
                  width=NUM_COLS, height=NUM_ROWS):
         """!
         @brief   Set up an MLX90640 camera.
@@ -170,8 +170,9 @@ class MLX_Cam:
     def get_bytes(self, array, limits=None):
         """!
         @brief   Generate a bytes object containing image data.
-        @details This function returns a bytes object containing the values
-                 for all the pixels in the camera.
+        @details This function generates a set of lines, each having one row of
+                 image data in Comma Separated Variable format. The lines can
+                 be printed or saved to a file using a @c for loop.
         @param   array The array of data to be presented
         @param   limits A 2-iterable containing the maximum and minimum values
                  to which the data should be scaled, or @c None for no scaling
@@ -185,8 +186,9 @@ class MLX_Cam:
             
         arr = bytearray(32*24)
         
-        for n in range(len(arr)):
-            pix = int((array[n]+ offset) * scale)
+        for n in range(len(bytearray)):
+            pix = bytes((array[n%self._width * self._width + (self._width - n//self._width - 1)]
+                          + offset) * scale)
             arr[n] = pix
             
         return arr
@@ -262,9 +264,7 @@ if __name__ == "__main__":
                 for line in camera.get_csv(image, limits=(0, 99)):
                     print(line)
             else:
-                arr = camera.get_bytes(image,limits = (0,255))
-                print(arr)
-    
+                camera.ascii_art(image)
             time.sleep_ms(10000)
 
         except KeyboardInterrupt:
