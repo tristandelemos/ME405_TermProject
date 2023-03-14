@@ -66,74 +66,7 @@ class MLX_Cam:
         self._image = self._camera.image
 
 
-    def ascii_image(self, array, pixel="██", textcolor="0;180;0"):
-        """!
-        @brief   Show low-resolution camera data as shaded pixels on a text
-                 screen.
-        @details The data is printed as a set of characters in columns for the
-                 number of rows in the camera's image size. This function is
-                 intended for testing an MLX90640 thermal infrared sensor.
-
-                 A pair of extended ACSII filled rectangles is used by default
-                 to show each pixel so that the aspect ratio of the display on
-                 screens isn't too smushed. Each pixel is colored using ANSI
-                 terminal escape codes which work in only some programs such as
-                 PuTTY.  If shown in simpler terminal programs such as the one
-                 used in Thonny, the display just shows a bunch of pixel
-                 symbols with no difference in shading (boring).
-
-                 A simple auto-brightness scaling is done, setting the lowest
-                 brightness of a filled block to 0 and the highest to 255. If
-                 there are bad pixels, this can reduce contrast in the rest of
-                 the image.
-
-                 After the printing is done, character color is reset to a
-                 default of medium-brightness green, or something else if
-                 chosen.
-        @param   array An array of (self._width * self._height) pixel values
-        @param   pixel Text which is shown for each pixel, default being a pair
-                 of extended-ASCII blocks (code 219)
-        @param   textcolor The color to which printed text is reset when the
-                 image has been finished, as a string "<r>;<g>;<b>" with each
-                 letter representing the intensity of red, green, and blue from
-                 0 to 255
-        """
-        minny = min(array)
-        scale = 255.0 / (max(array) - minny)
-        for row in range(self._height):
-            for col in range(self._width):
-                pix = int((array[row * self._width + (self._width - col - 1)]
-                           - minny) * scale)
-                print(f"\033[38;2;{pix};{pix};{pix}m{pixel}", end='')
-            print(f"\033[38;2;{textcolor}m")
-
-
-    ## A "standard" set of characters of different densities to make ASCII art
-    asc = " -.:=+*#%@"
-
-
-    def ascii_art(self, array):
-        """!
-        @brief   Show a data array from the IR image as ASCII art.
-        @details Each character is repeated twice so the image isn't squished
-                 laterally. A code of "><" indicates an error, probably caused
-                 by a bad pixel in the camera. 
-        @param   array The array to be shown, probably @c image.v_ir
-        """
-        scale = 10 / (max(array) - min(array))
-        offset = -min(array)
-        for row in range(self._height):
-            line = ""
-            for col in range(self._width):
-                pix = int((array[row * self._width + (self._width - col - 1)]
-                           + offset) * scale)
-                try:
-                    the_char = MLX_Cam.asc[pix]
-                    print(f"{the_char}{the_char}", end='')
-                except IndexError:
-                    print("><", end='')
-            print('')
-        return
+    
 
 
     def get_csv(self, array, limits=None):
@@ -155,8 +88,7 @@ class MLX_Cam:
         for row in range(self._height):
             line = ""
             for col in range(self._width):
-                pix = int((array[row * self._width + (self._width - col - 1)]
-                          * scale) + offset)
+                pix = int((array[row * self._width + (self._width - col - 1)] * scale) + offset)
                 if col:
                     line += ","
                 line += f"{pix}"
@@ -184,6 +116,31 @@ class MLX_Cam:
 
         return image
     
+    def get_bytes(self, array, limits=None):
+        """!
+        @brief   Generate a bytes object containing image data.
+        @details This function returns a bytes object containing the values
+                 for all the pixels in the camera.
+        @param   array The array of data to be presented
+        @param   limits A 2-iterable containing the maximum and minimum values
+                 to which the data should be scaled, or @c None for no scaling
+        """
+        if limits and len(limits) == 2:
+            #print("here")
+            scale = (limits[1] - limits[0]) / (max(array) - min(array))
+            offset = limits[0] - min(array)
+        else:
+            offset = 0.0
+            scale = 1.0
+            
+        arr = bytearray(32*24)
+        
+        for n in range(len(arr)):
+            pix = int((array[n]*scale)+offset)
+            arr[n] = pix
+            
+        return arr
+    
 
 
 def calculate_centroid(camera, image):
@@ -199,23 +156,28 @@ def calculate_centroid(camera, image):
     # x_list = []
     # y_list = []
 
-    x_array = bytearray(b'\x00')
+    #x_array = bytearray(b'\x00')
 
-    x_array = array("i")
-    y_array = array("i")
+    x_array = array("B")
+    y_array = array("B")
 
     y = 24
     num = 0
 
     for line in camera.get_csv(image.v_ir, limits=(0, 99)):
         line_list = line.split(",")
+        #print(line_list)
         for i in range(len(line_list)):
             if int(line_list[i]) >= 50:
                 # x_list.append(i)
                 # y_list.append(y)
                 x_array.append(i)
                 y_array.append(y)
+                #print(line_list[i])
+                #x_array[num] = i
+                #y_array[num] = y
                 num += 1
+                
         y -= 1
         
     x_sum = sum(x_array)
@@ -223,6 +185,8 @@ def calculate_centroid(camera, image):
     
     y_sum = sum(y_array)
     del y_array
+    
+    print("num1:", num)
 
     if num > 0:
         centroid_x = x_sum/num
@@ -234,7 +198,7 @@ def calculate_centroid(camera, image):
 
 
 
-def calculate_centroid_bytes(image_array, scalar=0.8):
+def calculate_centroid_bytes(image_array, upper=99, scalar=0.8):
     """!
     @brief   Calculates centroid from bytearray of points in image
     @details 
@@ -251,6 +215,11 @@ def calculate_centroid_bytes(image_array, scalar=0.8):
     y_val = 24
 
     num = 0
+    
+    min = 100
+    max = 0
+    
+    #print("length of image_array:", len(image_array))
 
     # for byte in image_array:
     for i in range(len(image_array)):
@@ -260,23 +229,45 @@ def calculate_centroid_bytes(image_array, scalar=0.8):
         # if y_val == 0:
         #     print("shouldn't get here")
         #     break
+        
 
         byte = image_array[i]
+        
+        #print(byte)
+        
+        if byte < min:
+            min = byte
+        if byte > max:
+            max = byte
 
         x_val = i%32 + 1
         y_val = 24 - i//32
-
-        if byte > b(255 * scalar):
+        
+        #if byte > 240:
+        #    print(byte)
+        
+        if byte > (upper * scalar):
             x_array.append(x_val)
             y_array.append(y_val)
             num += 1
+            
+    #print("min:", min)            
+    #print("max:", max)
 
     x_sum = sum(x_array)
     y_sum = sum(y_array)
 
-    cent_x = x_sum/num
-    cent_y = y_sum/num
+    del x_array
+    del y_array
+    
+    print("num2:", num)
 
+    if num > 0:
+        cent_x = x_sum/num
+        cent_y = y_sum/num
+    else:
+        return -1, -1
+    
     return cent_x, cent_y
 
 
@@ -355,44 +346,52 @@ if __name__ == "__main__":
                     
             # time.sleep_ms(5000)
             print()
-            
-            # cleared_image.reverse()
-            # y = 24
-            # for line in cleared_image:
-            #     linelist = line.split(",")
-            #     newline = ""
-            #     for i in range(len(linelist)):
-            #         #print(f"line[i]: {line[i]}")
-            #         if (int(linelist[i]) < 40):
-            #             linelist[i] = "0"
-            #             newline += "--"
-            #         elif (int(linelist[i]) < 50):
-            #             newline += "++"
-            #         else:
-            #             newline += "&&"
-                        
-            #     # newline = ",".join(linelist)
-            #     if y > 9:
-            #         print(y, newline)
-            #     else:
-            #         print(y, " " + newline)
-            #     y -= 1
-
-            # print(y, " 0102030405060708091011121314151617181920212223242526272829303132")
+        
             
             my_print_time = time.ticks_ms()
 
-            # c_x, c_y = calculate_centroid(cleared_image)
+
             c_x, c_y = calculate_centroid(camera, image)
 
             centroid_time = time.ticks_ms()
+
+            second_start = time.ticks_ms()
+            image_array = camera.get_bytes(image.v_ir, limits=(0, 99))
+            getbytestime = time.ticks_ms()
+            c_x2, c_y2 = calculate_centroid_bytes(image_array, upper=100, scalar=0.5)
+            cbytestime = time.ticks_ms()
+            
+
 
             print(f"initial print time: {time.ticks_diff(print_time, new_start)}")
             print(f"second print time: {time.ticks_diff(my_print_time, print_time)}")
             print(f"centroid calc time: {time.ticks_diff(centroid_time, my_print_time)}")
             print(f"total post-snap time: {time.ticks_diff(centroid_time, new_start)}")
+            
+            
+            print(f"get bytes time: {time.ticks_diff(getbytestime, second_start)}")
+            print(f"centroid 2 time: {time.ticks_diff(cbytestime, getbytestime)}")
 
             print(f"\nCentroid: {c_x}, {c_y}")
+            print(f"\nCentroid2: {32-c_x2}, {c_y2}")
+            
+            #angle calculation
+            cx = 32-c_x2
+            if (cx) > 16:
+                cx_f = cx-16
+            else:
+                cx_f = -1*(16-cx)
+            if (c_y2) > 12:
+                cy_f = c_y2-12
+            else:
+                cy_f = -1*(12-c_y2)
+            
+            print(f"cx_f: {cx_f}, cy_f: {cy_f}")
+            x_deg = cx_f * (55/32)
+            y_deg = cy_f * (35/24)
+                
+            
+            print(f"angle from c2 in degrees: {x_deg}, {y_deg}")
             
             cont = input("continue? y or n ")
             if cont == "n":
