@@ -184,6 +184,8 @@ def calculate_centroid(camera, image):
     
     y_sum = sum(y_array)
     del y_array
+    
+    print("num1:", num)
 
     if num > 0:
         centroid_x = x_sum/num
@@ -241,7 +243,7 @@ def calculate_centroid_bytes(ref_array, image_array, upper=99, scalar=0.8):
     x_sum = sum(x_array)
     y_sum = sum(y_array)
 
-    print("num", num)
+    print("num2:", num)
 
     if num > 0:
         cent_x = x_sum/num
@@ -363,7 +365,7 @@ if __name__ == "__main__":
             centroid_time = time.ticks_ms()
 
             second_start = time.ticks_ms()
-            image_array = camera.get_bytes(image, limits = (0, 99))
+            image_array = camera.get_bytes(image, limits=(0, 99))
             getbytestime = time.ticks_ms()
             c_x2, c_y2 = calculate_centroid_bytes(ref_array, image_array, upper=99, scalar=0.3)
             cbytestime = time.ticks_ms()

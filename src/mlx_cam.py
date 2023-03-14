@@ -88,8 +88,7 @@ class MLX_Cam:
         for row in range(self._height):
             line = ""
             for col in range(self._width):
-                pix = int((array[row * self._width + (self._width - col - 1)]
-                          * scale) + offset)
+                pix = int((array[row * self._width + (self._width - col - 1)] * scale) + offset)
                 if col:
                     line += ","
                 line += f"{pix}"
@@ -167,13 +166,14 @@ def calculate_centroid(camera, image):
 
     for line in camera.get_csv(image.v_ir, limits=(0, 99)):
         line_list = line.split(",")
+        #print(line_list)
         for i in range(len(line_list)):
             if int(line_list[i]) >= 50:
                 # x_list.append(i)
                 # y_list.append(y)
                 x_array.append(i)
                 y_array.append(y)
-                print(line_list[i])
+                #print(line_list[i])
                 #x_array[num] = i
                 #y_array[num] = y
                 num += 1
@@ -185,6 +185,8 @@ def calculate_centroid(camera, image):
     
     y_sum = sum(y_array)
     del y_array
+    
+    print("num1:", num)
 
     if num > 0:
         centroid_x = x_sum/num
@@ -216,6 +218,8 @@ def calculate_centroid_bytes(image_array, upper=99, scalar=0.8):
     
     min = 100
     max = 0
+    
+    #print("length of image_array:", len(image_array))
 
     # for byte in image_array:
     for i in range(len(image_array)):
@@ -225,8 +229,11 @@ def calculate_centroid_bytes(image_array, upper=99, scalar=0.8):
         # if y_val == 0:
         #     print("shouldn't get here")
         #     break
+        
 
         byte = image_array[i]
+        
+        #print(byte)
         
         if byte < min:
             min = byte
@@ -236,22 +243,24 @@ def calculate_centroid_bytes(image_array, upper=99, scalar=0.8):
         x_val = i%32 + 1
         y_val = 24 - i//32
         
-        if byte > 240:
-            print(byte)
+        #if byte > 240:
+        #    print(byte)
         
         if byte > (upper * scalar):
             x_array.append(x_val)
             y_array.append(y_val)
             num += 1
             
-    print("min:", min)            
-    print("max:", max)
+    #print("min:", min)            
+    #print("max:", max)
 
     x_sum = sum(x_array)
     y_sum = sum(y_array)
 
     del x_array
     del y_array
+    
+    print("num2:", num)
 
     if num > 0:
         cent_x = x_sum/num
@@ -347,9 +356,9 @@ if __name__ == "__main__":
             centroid_time = time.ticks_ms()
 
             second_start = time.ticks_ms()
-            image_array = camera.get_bytes(image.v_ir)
+            image_array = camera.get_bytes(image.v_ir, limits=(0, 99))
             getbytestime = time.ticks_ms()
-            c_x2, c_y2 = calculate_centroid_bytes(image_array, upper=99, scalar=0.5)
+            c_x2, c_y2 = calculate_centroid_bytes(image_array, upper=100, scalar=0.5)
             cbytestime = time.ticks_ms()
             
 
@@ -360,11 +369,29 @@ if __name__ == "__main__":
             print(f"total post-snap time: {time.ticks_diff(centroid_time, new_start)}")
             
             
-            print(f"get bytes time: {time.ticks_diff(second_start, getbytestime)}")
+            print(f"get bytes time: {time.ticks_diff(getbytestime, second_start)}")
             print(f"centroid 2 time: {time.ticks_diff(cbytestime, getbytestime)}")
 
             print(f"\nCentroid: {c_x}, {c_y}")
             print(f"\nCentroid2: {32-c_x2}, {c_y2}")
+            
+            #angle calculation
+            cx = 32-c_x2
+            if (cx) > 16:
+                cx_f = cx-16
+            else:
+                cx_f = -1*(16-cx)
+            if (c_y2) > 12:
+                cy_f = c_y2-12
+            else:
+                cy_f = -1*(12-c_y2)
+            
+            print(f"cx_f: {cx_f}, cy_f: {cy_f}")
+            x_deg = cx_f * (55/32)
+            y_deg = cy_f * (35/24)
+                
+            
+            print(f"angle from c2 in degrees: {x_deg}, {y_deg}")
             
             cont = input("continue? y or n ")
             if cont == "n":
