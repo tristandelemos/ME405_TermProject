@@ -68,29 +68,39 @@ def turn_around():
     """
     # need to find the point to turn 180 degrees
     con_yaw.set_setpoint(-3000)
+    con_pitch.set_setpoint(500)
 
     # Read encoder to get an initial value
     read_yaw = enc_yaw.read()
+    read_pitch = enc_pitch.read()
     # Zero the position so that the step response moves a known amount
     pos_yaw = 0
+    pos_pitch = 0
     
     while True:
         # Update the read and postion values
         read_yaw,pos_yaw = enc_yaw.update(read_yaw,pos_yaw)
+        read_pitch,pos_pitch = enc_pitch.update(read_pitch,pos_pitch)
     
         # Calculate effort with pos and neg limits
         effort_yaw = con_yaw.run(pos_yaw)
+        effort_pitch = con_pitch.run(pos_pitch)
         
         if effort_yaw<-100:
             effort_yaw = -100
         elif effort_yaw>100:
             effort_yaw = 100
             
+        if effort_pitch<-100:
+            effort_pitch = -100
+        elif effort_pitch>100:
+            effort_pitch = 100
+            
         # Set the motor duty cycle
         motor_yaw.set_duty_cycle(effort_yaw)
-        
+        motor_pitch.set_duty_cycle(effort_pitch)
         # Yield and come back at top of while loop in next call
-        yield effort_yaw
+        yield effort_yaw, effort_yaw
 
 
 def take_picture(camera):
