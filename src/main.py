@@ -13,7 +13,8 @@ import pyb
 from machine import Pin, I2C
 from encoder_driver import EncoderDriver
 from motor_driver import MotorDriver
-from pro_control import ProControl
+from pid_control import PidControl
+#from pro_control import ProControl
 
 
 S0_INIT = 0
@@ -159,7 +160,7 @@ def main():
             # Take picture and find warmest area to shoot at
             if(state == S1_TAKE_PICTURE):
                 # this is how we are going to wait those five seconds
-                if(input() == 'y')
+                if(input() == 'y'):
                     yaw_position, pitch_position = take_picture(camera)
         
                 state = S2_MOVE_MOTORS
@@ -194,14 +195,14 @@ if __name__ == "__main__":
     gc.collect()
     
     # Initialize encoder objects
-    enc_yaw = EncoderDriver(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
-    enc_pitch = EncoderDriver(pyb.Pin.board.PC6, pyb.Pin.board.PC7, 8)
+    enc_yaw = EncoderDriver(pyb.Pin.board.PC6, pyb.Pin.board.PC7, 8)
+    enc_pitch = EncoderDriver(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
     # Initialize motor objects
-    motor_yaw = MotorDriver (pyb.Pin.board.PA10,pyb.Pin.board.PB4,pyb.Pin.board.PB5,3)
-    motor_pitch = MotorDriver (pyb.Pin.board.PC1,pyb.Pin.board.PA0,pyb.Pin.board.PA1,5)
+    motor_yaw = MotorDriver (pyb.Pin.board.PC1,pyb.Pin.board.PA0,pyb.Pin.board.PA1,5)
+    motor_pitch = MotorDriver (pyb.Pin.board.PA10,pyb.Pin.board.PB4,pyb.Pin.board.PB5,3)
     # Initialize proportional controllers with default values
-    con_yaw = ProControl()
-    con_pitch = ProControl()
+    con_yaw = PidControl(Kp = 0.15,Ki = 0.0001,Kd = 0.03)
+    con_pitch = PidControl(Kp = 0.15,Ki = 0.0001,Kd = 0.03)
     
     
     # Intitialize camera
@@ -223,7 +224,7 @@ if __name__ == "__main__":
     print(f"I2C Scan: {scanhex}")
     gc.collect()
     # Create the camera object and set it up in default mode
-    camera = MLX_Cam(i2c_bus)
+    camera = mlx_cam_mod.MLX_Cam(i2c_bus)
     
     
     

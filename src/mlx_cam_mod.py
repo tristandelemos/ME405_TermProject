@@ -118,10 +118,9 @@ class MLX_Cam:
             
         arr = bytearray(32*24)
         
-        for n in range(len(bytearray)):
-            pix = bytes((array[n%self._width * self._width + (self._width - n//self._width - 1)]
-                          + offset) * scale)
-            arr[n] = pix
+        for n in range(len(arr)):
+            pix = (array[n]*scale+offset)
+            arr[n] = int(pix)
             
         return arr
     
