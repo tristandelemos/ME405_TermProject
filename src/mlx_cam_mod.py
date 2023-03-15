@@ -99,32 +99,6 @@ class MLX_Cam:
         return
 
 
-    def get_bytes(self, array, limits=None):
-        """!
-        @brief   Generate a bytes object containing image data.
-        @details This function generates a set of lines, each having one row of
-                 image data in Comma Separated Variable format. The lines can
-                 be printed or saved to a file using a @c for loop.
-        @param   array The array of data to be presented
-        @param   limits A 2-iterable containing the maximum and minimum values
-                 to which the data should be scaled, or @c None for no scaling
-        """
-        if limits and len(limits) == 2:
-            scale = (limits[1] - limits[0]) / (max(array) - min(array))
-            offset = limits[0] - min(array)
-        else:
-            offset = 0.0
-            scale = 1.0
-            
-        arr = bytearray(32*24)
-        
-        for n in range(len(arr)):
-            pix = (array[n]*scale+offset)
-            arr[n] = int(pix)
-            
-        return arr
-    
-
     def get_image(self):
         """!
         @brief   Get one image from a MLX90640 camera.
@@ -145,60 +119,87 @@ class MLX_Cam:
         return image
 
 
-def calculate_centroid(camera, image):
-    """!
-    @brief   Calculates centroid from image
-    @details Loops through csv formatted image, takes high values and calculates
-             the centroid from it. csv_image would optimally be pre-filtered to
-             eliminate outliers
-    @param   csv_image The thermal image file in csv format
-    @returns A tuple of x, y values of the centroid position"""
-    # image = csv_image
+    def calculate_centroid(camera, image):
+        """!
+        @brief   Calculates centroid from image
+        @details Loops through csv formatted image, takes high values and calculates
+                 the centroid from it. csv_image would optimally be pre-filtered to
+                 eliminate outliers
+        @param   csv_image The thermal image file in csv format
+        @returns A tuple of x, y values of the centroid position"""
+        # image = csv_image
 
-    # x_list = []
-    # y_list = []
+        # x_list = []
+        # y_list = []
 
-    #x_array = bytearray(b'\x00')
+        #x_array = bytearray(b'\x00')
 
-    x_array = array("B")
-    y_array = array("B")
+        x_array = array("B")
+        y_array = array("B")
 
-    y = 24
-    num = 0
+        y = 24
+        num = 0
 
-    for line in camera.get_csv(image, limits=(0, 99)):
-        line_list = line.split(",")
-        for i in range(len(line_list)):
-            if int(line_list[i]) >= 50:
-                # x_list.append(i)
-                # y_list.append(y)
-                x_array.append(i)
-                y_array.append(y)
-                #x_array[num] = i
-                #y_array[num] = y
-                num += 1
-                
-        y -= 1
+        for line in camera.get_csv(image, limits=(0, 99)):
+            line_list = line.split(",")
+            for i in range(len(line_list)):
+                if int(line_list[i]) >= 50:
+                    # x_list.append(i)
+                    # y_list.append(y)
+                    x_array.append(i)
+                    y_array.append(y)
+                    #x_array[num] = i
+                    #y_array[num] = y
+                    num += 1
+                    
+            y -= 1
+            
+        x_sum = sum(x_array)
+        del x_array
         
-    x_sum = sum(x_array)
-    del x_array
+        y_sum = sum(y_array)
+        del y_array
+        
+        print("num1:", num)
+
+        if num > 0:
+            centroid_x = x_sum/num
+            centroid_y = y_sum/num
+        else:
+            return -1, -1
+
+        return centroid_x, centroid_y
+
+
+
+    def get_bytes(self, array, limits=None):
+        """!
+        @brief   Generate a bytes object containing image data.
+        @details This function generates a set of lines, each having one row of
+                 image data in Comma Separated Variable format. The lines can
+                 be printed or saved to a file using a @c for loop.
+        @param   array The array of data to be presented
+        @param   limits A 2-iterable containing the maximum and minimum values
+                 to which the data should be scaled, or @c None for no scaling
+        """
+        if limits and len(limits) == 2:
+            scale = (limits[1] - limits[0]) / 255#(max(array) - min(array))
+            offset = 0#limits[0] - min(array)
+        else:
+            offset = 0.0
+            scale = 1.0
+            
+        arr = bytearray(32*24)
+        
+        for n in range(len(arr)):
+            pix = (array[n]*scale+offset)
+            arr[n] = int(pix)
+            
+        return arr
     
-    y_sum = sum(y_array)
-    del y_array
+
     
-    print("num1:", num)
-
-    if num > 0:
-        centroid_x = x_sum/num
-        centroid_y = y_sum/num
-    else:
-        return -1, -1
-
-    return centroid_x, centroid_y
-
-
-
-def calculate_centroid_bytes(ref_array, image_array, upper=99, scalar=0.8):
+def calculate_centroid_bytes(ref_array, image_array, limit = 128):
     """!
     @brief   Calculates centroid from bytearray of points in image
     @details 
@@ -233,7 +234,7 @@ def calculate_centroid_bytes(ref_array, image_array, upper=99, scalar=0.8):
         x_val = i%32 + 1
         y_val = 24 - i//32
         
-        if byte > (upper * scalar):
+        if byte > (limit):
             #print(byte)
             x_array.append(x_val)
             y_array.append(y_val)
@@ -294,9 +295,10 @@ if __name__ == "__main__":
     # Create the camera object and set it up in default mode
     camera = MLX_Cam(i2c_bus)
     
-    ref = camera.get_image()
-    ref_array = camera.get_bytes(ref, (0, 99))
-
+    #ref = camera.get_image()
+    #ref_array = camera.get_bytes(ref, (0, 99))
+    ref_array =bytearray(b'\xea\xe6\xea\xe6\xe8\xe5\xe8\xe5\xe8\xe3\xe8\xe4\xe8\xe2\xe7\xe3\xe9\xe1\xe7\xe3\xe9\xe2\xe8\xe2\xe9\xe1\xe9\xe2\xe7\xe1\xea\xdf\xe7\xe5\xe3\xe2\xe6\xe5\xe2\xe2\xe5\xe3\xe2\xe1\xe5\xe2\xe1\xe0\xe5\xe1\xe1\xdf\xe6\xe1\xe3\xdf\xe6\xe1\xe3\xde\xe5\xe0\xe4\xdd\xe9\xe5\xe8\xe6\xe7\xe3\xe8\xe4\xe8\xe3\xe7\xe3\xe6\xe2\xe6\xe2\xe8\xe2\xe7\xe3\xe8\xe2\xe6\xe2\xe8\xe1\xe8\xe2\xe8\xe1\xe8\xdf\xe5\xe5\xe3\xe3\xe4\xe3\xe2\xe1\xe5\xe2\xe2\xe0\xe4\xe1\xe1\xdf\xe5\xe0\xe2\xdf\xe5\xe1\xe1\xdf\xe5\xe0\xe3\xdf\xe5\xe0\xe3\xdc\xe9\xe5\xe8\xe6\xe9\xe4\xe8\xe4\xe8\xe2\xe7\xe3\xe8\xe2\xe6\xe2\xe9\xe2\xe7\xe2\xe8\xe1\xe7\xe2\xe9\xe0\xe7\xe1\xe8\xe0\xe7\xde\xe6\xe4\xe1\xe1\xe6\xe2\xe1\xe0\xe5\xe1\xe1\xdf\xe5\xe1\xe1\xdf\xe6\xe1\xe1\xdf\xe5\xe1\xe2\xdf\xe6\xdf\xe3\xdf\xe5\xdf\xe3\xdc\xe9\xe5\xe7\xe5\xe7\xe4\xe7\xe4\xe7\xe3\xe7\xe3\xe6\xe1\xe7\xe2\xe8\xe2\xe7\xe2\xe7\xe1\xe6\xe2\xe8\xe1\xe8\xe1\xe8\xe0\xe8\xdf\xe5\xe3\xe1\xe1\xe4\xe3\xe0\xe0\xe3\xe1\xe1\xdf\xe3\xe0\xe0\xde\xe4\xe1\xe1\xde\xe4\xe0\xe1\xde\xe6\xdf\xe1\xde\xe5\xdf\xe3\xdb\xe8\xe6\xe7\xe5\xe7\xe3\xe7\xe4\xe7\xe2\xe6\xe3\xe5\xe2\xe6\xe2\xe7\xe1\xe6\xe2\xe6\xe1\xe7\xe2\xe8\xe0\xe7\xe1\xe8\xe0\xe8\xdf\xe4\xe2\xe0\xe1\xe2\xe1\xe1\xdf\xe3\xe0\xdf\xde\xe1\xe0\xdf\xde\xe4\xdf\xe0\xde\xe4\xdf\xe1\xde\xe5\xdf\xe0\xdd\xe5\xdf\xe2\xdc\xe9\xe5\xe7\xe5\xe8\xe4\xe7\xe4\xe7\xe2\xe5\xe2\xe6\xe1\xe6\xe2\xe7\xe1\xe7\xe2\xe8\xe1\xe7\xe2\xe8\xe0\xe6\xe1\xe6\xe0\xe7\xde\xe4\xe1\xdf\xe0\xe3\xe2\xe0\xdf\xe3\xe1\xdf\xde\xe2\xdf\xdf\xde\xe3\xde\xe0\xde\xe4\xdf\xe0\xdd\xe4\xde\xe0\xdd\xe3\xde\xe1\xdb\xe7\xe4\xe6\xe4\xe5\xe3\xe5\xe4\xe5\xe2\xe5\xe1\xe5\xe1\xe5\xe1\xe6\xe1\xe5\xe1\xe7\xe1\xe6\xe2\xe7\xe1\xe6\xe1\xe6\xdf\xe7\xdf\xe3\xe1\xde\xdf\xe1\xdf\xde\xde\xe1\xde\xde\xdc\xe0\xdf\xde\xdc\xe1\xde\xde\xdc\xe3\xde\xe0\xde\xe3\xde\xdf\xdc\xe3\xde\xe1\xda\xe5\xe5\xe5\xe5\xe6\xe3\xe6\xe3\xe5\xe1\xe4\xe1\xe5\xe1\xe5\xe1\xe6\xe1\xe5\xe1\xe6\xe1\xe6\xe1\xe7\xe0\xe6\xe1\xe5\xdf\xe7\xde\xe0\xe1\xdd\xde\xe1\xdf\xdd\xde\xe0\xde\xdc\xdc\xe0\xdd\xdd\xdc\xe1\xde\xdd\xdc\xe2\xde\xde\xdc\xe3\xde\xdf\xdc\xe2\xde\xe0\xda\xe5\xe4\xe5\xe4\xe5\xe2\xe4\xe1\xe5\xe0\xe3\xe1\xe5\xe0\xe3\xe0\xe6\xe0\xe5\xe1\xe5\xdf\xe5\xe1\xe6\xdf\xe5\xdf\xe5\xdf\xe5\xdd\xe0\xdf\xdc\xdd\xdf\xde\xdc\xdc\xdf\xde\xdc\xdb\xdf\xdd\xdc\xdb\xe1\xdd\xdd\xdb\xe1\xde\xdd\xdc\xe3\xdd\xde\xdb\xe1\xdd\xdf\xd9\xe3\xe3\xe4\xe3\xe3\xe1\xe4\xe1\xe3\xe0\xe4\xe1\xe3\xe0\xe4\xe0\xe3\xdf\xe5\xe1\xe4\xdf\xe5\xdf\xe5\xdf\xe4\xdf\xe5\xdf\xe6\xde\xdd\xde\xda\xdc\xde\xdd\xdb\xdc\xdd\xdc\xdb\xda\xde\xdc\xda\xdb\xdf\xdc\xdc\xda\xdf\xdc\xdc\xda\xe1\xdc\xdd\xda\xe1\xdc\xde\xd9\xe3\xe2\xe3\xe3\xe2\xe1\xe3\xe1\xe3\xe0\xe3\xe1\xe2\xe0\xe3\xe1\xe3\xdf\xe5\xe0\xe4\xdf\xe4\xe0\xe5\xdf\xe4\xdf\xe3\xde\xe5\xde\xdb\xdd\xd9\xdb\xdc\xdc\xda\xda\xdd\xdc\xda\xda\xdc\xdc\xda\xd9\xde\xdc\xdb\xd9\xde\xdc\xdb\xda\xe0\xda\xdc\xd9\xdf\xdc\xdc\xd8\xe2\xe2\xe2\xe3\xe2\xe1\xe3\xe1\xe2\xdf\xe1\xdf\xe1\xdf\xe2\xdf\xe4\xdf\xe3\xe0\xe4\xdf\xe3\xdf\xe3\xde\xe2\xdf\xe2\xde\xe2\xdd\xd7\xd9\xd4\xd7\xd8\xd9\xd5\xd6\xd8\xd8\xd5\xd6\xd8\xd7\xd6\xd5\xda\xd7\xd5\xd6\xda\xd7\xd6\xd5\xda\xd7\xd7\xd6\xda\xd8\xd9\xd4')
+    #print(ref_array)
     while True:
         try:
             # Get and image and see how long it takes to grab that image
@@ -308,67 +310,20 @@ if __name__ == "__main__":
 
             new_start = time.ticks_ms()
 
-            # Can show image.v_ir, image.alpha, or image.buf; image.v_ir best?
-            # Display pixellated grayscale or numbers in CSV format; the CSV
-            # could also be written to a file. Spreadsheets, Matlab(tm), or
-            # CPython can read CSV and make a decent false-color heat plot.
-            # cleared_image = []
-            show_image = False
-            show_csv = False
-            if show_image:
-                camera.ascii_image(image.buf)
-            elif show_csv:
-                for line in camera.get_csv(image, limits=(0, 99)):
-                    # cleared_image.append(line)
-                    print(line)
-            else:
-                # camera.ascii_art(image.v_ir)
-                pass
-                
-                # for line in camera.get_csv(image.v_ir, limits=(0, 99)):
-                #     cleared_image.append(line)
-                    # time.sleep_ms(1)
-
             print_time = time.ticks_ms()
                     
-            # time.sleep_ms(5000)
-            print()
-            
-            # cleared_image.reverse()
-            # y = 24
-            # for line in cleared_image:
-            #     linelist = line.split(",")
-            #     newline = ""
-            #     for i in range(len(linelist)):
-            #         #print(f"line[i]: {line[i]}")
-            #         if (int(linelist[i]) < 40):
-            #             linelist[i] = "0"
-            #             newline += "--"
-            #         elif (int(linelist[i]) < 50):
-            #             newline += "++"
-            #         else:
-            #             newline += "&&"
-                        
-            #     # newline = ",".join(linelist)
-            #     if y > 9:
-            #         print(y, newline)
-            #     else:
-            #         print(y, " " + newline)
-            #     y -= 1
-
-            # print(y, " 0102030405060708091011121314151617181920212223242526272829303132")
             
             my_print_time = time.ticks_ms()
 
             # c_x, c_y = calculate_centroid(cleared_image)
-            c_x, c_y = calculate_centroid(camera, image)
+            #c_x, c_y = calculate_centroid(camera, image)
 
             centroid_time = time.ticks_ms()
 
             second_start = time.ticks_ms()
-            image_array = camera.get_bytes(image, limits=(0, 99))
+            image_array = camera.get_bytes(image)
             getbytestime = time.ticks_ms()
-            c_x2, c_y2 = calculate_centroid_bytes(ref_array, image_array, upper=99, scalar=0.3)
+            c_x2, c_y2 = calculate_centroid_bytes(ref_array, image_array, limit = 1)
             cbytestime = time.ticks_ms()
             
 
@@ -382,7 +337,7 @@ if __name__ == "__main__":
             print(f"get bytes time: {time.ticks_diff(getbytestime, second_start)}")
             print(f"centroid 2 time: {time.ticks_diff(cbytestime, getbytestime)}")
 
-            print(f"\nCentroid: {c_x}, {c_y}")
+            #print(f"\nCentroid: {c_x}, {c_y}")
             print(f"\nCentroid2: {c_x2}, {c_y2}")
             
             cont = input("continue? y or n ")
