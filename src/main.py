@@ -7,7 +7,7 @@ import utime
 import cotask
 import task_share
 import gc
-import mlx_cam_mod
+import mlx_cam_mod as camera
 import servo
 import pyb
 from machine import Pin, I2C
@@ -67,7 +67,7 @@ def turn_around():
     @brief	Turn the yaw axis motor to turn 180 degrees
     """
     # need to find the point to turn 180 degrees
-    con_yaw.set_setpoint()
+    con_yaw.set_setpoint(-3000)
 
     # Read encoder to get an initial value
     read_yaw = enc_yaw.read()
@@ -150,24 +150,27 @@ def main():
     while(True):
         
         try:
+            cotask.task_list.pri_sched()
+            
             if(state == S0_INIT):
                 # move yaw motor to turn around
-                while(turn_around() != 0):
-                    pass
                 state = S1_TAKE_PICTURE
             
             
             # Take picture and find warmest area to shoot at
             if(state == S1_TAKE_PICTURE):
                 # this is how we are going to wait those five seconds
-                if(input() == 'y'):
-                    yaw_position, pitch_position = take_picture(camera)
+                #if(input() == 'y'):
+                image_array = camera.get_bytes(image)
+                yaw_position, pitch_position = calculate_centroid_bytes(ref_array, image_array)
+                
         
                 state = S2_MOVE_MOTORS
         
             # Move motors to desired angles
             if(state == S2_MOVE_MOTORS):
-                move_motors()
+                cotask.task_list.append(task2)
+                
                 state = S3_SHOOT
             
             # activate servo to shoot
@@ -184,6 +187,15 @@ def main():
                 state = S1_TAKE_PICTURE
        
         except KeyboardInterrupt:
+            # If there is a keyboard interrupt, turn off the motors
+            motor_1.set_duty_cycle(0)
+            motor_2.set_duty_cycle(0)
+            # Tell the C-Python program that we are done
+            u2.write(b'end\r\n')
+            # Print exit statement
+            print('Program exited by user')
+            # Raise exception to exit out of all loops
+            raise Exception('Program Exited by User')
             break 
     
 if __name__ == "__main__":
@@ -226,17 +238,22 @@ if __name__ == "__main__":
     # Create the camera object and set it up in default mode
     camera = mlx_cam_mod.MLX_Cam(i2c_bus)
     
-    
+    pitch = 500
+    yaw  = -3000
     
     # Create the tasks. If trace is enabled for any task, memory will be
     # allocated for state transition tracing, and the application will run out
     # of memory after a while and quit. Therefore, use tracing only for 
     # debugging and set trace to False when it's not needed
-    task1 = cotask.Task(task_motors, name="Task_1", priority=1, period=20,
+    
+    
+    task1 = cotask.Task(turn_around, name="Task_1", priority=1, period=20,
+                        profile=False, trace=False)
+    task2 = cotask.Task(task_motors, name="Task_1", priority=1, period=20,
                         profile=False, trace=False)
     
     #task2 = cotask.Task(task2_pitch_motor, name="Task_2", priority=1, period=20,
-    #                    profile=False, trace=False)
+     #                   profile=False, trace=False)
     cotask.task_list.append(task1)
     #cotask.task_list.append(task2)
     
