@@ -171,7 +171,7 @@ def main():
             if(state == S1_TAKE_PICTURE):
                 # this is how we are going to wait those five seconds
                 #if(input() == 'y'):
-                image_array = camera.get_bytes(image)
+                image_array = cam.get_bytes(image)
                 yaw_position, pitch_position = calculate_centroid_bytes(ref_array, image_array)
                 
         
@@ -207,49 +207,34 @@ def main():
             # Raise exception to exit out of all loops
             raise Exception('Program Exited by User')
             break 
-    
+
 if __name__ == "__main__":
     """!@brief	This script creates instances of all the required modules and
             calls the test program in main()
         @details	The classes have to be instantiated here outside of functions
             so that their values can be accessed and changed by any function.
     """
-    gc.collect()
     
+    # Intitialize camera
+    
+    #from pyb import info
+
+    i2c_bus = I2C(1)
+    
+    #print('Allocated = ',gc.mem_alloc())
+    #print('Free = ',gc.mem_free())
+    # Create the camera object and set it up in default mode
+    gc.collect()
+    cam = camera.MLX_Cam(i2c_bus)
     # Initialize encoder objects
-    enc_yaw = EncoderDriver(pyb.Pin.board.PC6, pyb.Pin.board.PC7, 8)
-    enc_pitch = EncoderDriver(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+    enc_yaw = EncoderDriver(Pin.board.PC6, Pin.board.PC7, 8)
+    enc_pitch = EncoderDriver( Pin.board.PB6,  Pin.board.PB7, 4)
     # Initialize motor objects
-    motor_yaw = MotorDriver (pyb.Pin.board.PC1,pyb.Pin.board.PA0,pyb.Pin.board.PA1,5)
-    motor_pitch = MotorDriver (pyb.Pin.board.PA10,pyb.Pin.board.PB4,pyb.Pin.board.PB5,3)
+    motor_yaw = MotorDriver ( Pin.board.PC1, Pin.board.PA0, Pin.board.PA1,5)
+    motor_pitch = MotorDriver ( Pin.board.PA10, Pin.board.PB4, Pin.board.PB5,3)
     # Initialize proportional controllers with default values
     con_yaw = PidControl(Kp = 0.15,Ki = 0.0001,Kd = 0.03)
     con_pitch = PidControl(Kp = 0.15,Ki = 0.0001,Kd = 0.03)
-    
-    
-    # Intitialize camera
-    try:
-        from pyb import info
-
-    # Oops, it's not an STM32; assume generic machine.I2C for ESP32 and others
-    except ImportError:
-        # For ESP32 38-pin cheapo board from NodeMCU, KeeYees, etc.
-        i2c_bus = I2C(1, scl=Pin(22), sda=Pin(21))
-
-    # OK, we do have an STM32, so just use the default pin assignments for I2C1
-    else:
-        i2c_bus = I2C(1)
-
-    
-    i2c_address = 0x33
-    scanhex = [f"0x{addr:X}" for addr in i2c_bus.scan()]
-    print(f"I2C Scan: {scanhex}")
-    gc.collect()
-    # Create the camera object and set it up in default mode
-    camera = mlx_cam_mod.MLX_Cam(i2c_bus)
-    
-    pitch = 500
-    yaw  = -3000
     
     # Create the tasks. If trace is enabled for any task, memory will be
     # allocated for state transition tracing, and the application will run out
@@ -268,7 +253,7 @@ if __name__ == "__main__":
     #cotask.task_list.append(task2)
     
     # Create  servo object for firing
-    ser = Servo(pyb.Pin.board.PB10,2,3)
+    ser = Servo( Pin.board.PB10,2,3)
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started

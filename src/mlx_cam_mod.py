@@ -71,34 +71,6 @@ class MLX_Cam:
         self._image = self._camera.raw
 
 
-    def get_csv(self, array, limits=None):
-        """!
-        @brief   Generate a string containing image data in CSV format.
-        @details This function generates a set of lines, each having one row of
-                 image data in Comma Separated Variable format. The lines can
-                 be printed or saved to a file using a @c for loop.
-        @param   array The array of data to be presented
-        @param   limits A 2-iterable containing the maximum and minimum values
-                 to which the data should be scaled, or @c None for no scaling
-        """
-        if limits and len(limits) == 2:
-            scale = (limits[1] - limits[0]) / (max(array) - min(array))
-            offset = limits[0] - min(array)
-        else:
-            offset = 0.0
-            scale = 1.0
-        for row in range(self._height):
-            line = ""
-            for col in range(self._width):
-                pix = int((array[row * self._width + (self._width - col - 1)]
-                          + offset) * scale)
-                if col:
-                    line += ","
-                line += f"{pix}"
-            yield line
-        return
-
-
     def get_image(self):
         """!
         @brief   Get one image from a MLX90640 camera.
@@ -117,59 +89,6 @@ class MLX_Cam:
             image = self._camera.read_image(subpage)
 
         return image
-
-
-    def calculate_centroid(camera, image):
-        """!
-        @brief   Calculates centroid from image
-        @details Loops through csv formatted image, takes high values and calculates
-                 the centroid from it. csv_image would optimally be pre-filtered to
-                 eliminate outliers
-        @param   csv_image The thermal image file in csv format
-        @returns A tuple of x, y values of the centroid position"""
-        # image = csv_image
-
-        # x_list = []
-        # y_list = []
-
-        #x_array = bytearray(b'\x00')
-
-        x_array = array("B")
-        y_array = array("B")
-
-        y = 24
-        num = 0
-
-        for line in camera.get_csv(image, limits=(0, 99)):
-            line_list = line.split(",")
-            for i in range(len(line_list)):
-                if int(line_list[i]) >= 50:
-                    # x_list.append(i)
-                    # y_list.append(y)
-                    x_array.append(i)
-                    y_array.append(y)
-                    #x_array[num] = i
-                    #y_array[num] = y
-                    num += 1
-                    
-            y -= 1
-            
-        x_sum = sum(x_array)
-        del x_array
-        
-        y_sum = sum(y_array)
-        del y_array
-        
-        print("num1:", num)
-
-        if num > 0:
-            centroid_x = x_sum/num
-            centroid_y = y_sum/num
-        else:
-            return -1, -1
-
-        return centroid_x, centroid_y
-
 
 
     def get_bytes(self, array, limits=None):
@@ -199,61 +118,61 @@ class MLX_Cam:
     
 
     
-def calculate_centroid_bytes(ref_array, image_array, limit = 128):
-    """!
-    @brief   Calculates centroid from bytearray of points in image
-    @details 
-    @param   image_array A bytearray of image values in order starting at top left pixel
-             Lines are 32 long, there are 24 lines total
-    @param   scalar A float value from (0 to 1) used to determine how high the image values need to be to be
-             considered a target
-    @returns A tuple of x, y values of the centroid position"""
+    def calculate_centroid_bytes(self,ref_array, image_array, limit = 128):
+        """!
+        @brief   Calculates centroid from bytearray of points in image
+        @details 
+        @param   image_array A bytearray of image values in order starting at top left pixel
+                 Lines are 32 long, there are 24 lines total
+        @param   scalar A float value from (0 to 1) used to determine how high the image values need to be to be
+                 considered a target
+        @returns A tuple of x, y values of the centroid position"""
 
-    x_array = bytearray()
-    y_array = bytearray()
+        x_array = bytearray()
+        y_array = bytearray()
 
-    x_val = 1
-    y_val = 24
+        x_val = 1
+        y_val = 24
 
-    num = 0
+        num = 0
 
-    # for byte in image_array:
-    for i in range(len(image_array)):
-        # if x_val == 33:
-        #     x_val = 0
-        #     y_val -= 1
-        # if y_val == 0:
-        #     print("shouldn't get here")
-        #     break
+        # for byte in image_array:
+        for i in range(len(image_array)):
+            # if x_val == 33:
+            #     x_val = 0
+            #     y_val -= 1
+            # if y_val == 0:
+            #     print("shouldn't get here")
+            #     break
 
-        byte = image_array[i] - ref_array[i]
-        #print(byte)
-        if byte < 0:
-            byte = 0
-
-        x_val = i%32 + 1
-        y_val = 24 - i//32
-        
-        if byte > (limit):
+            byte = image_array[i] - ref_array[i]
             #print(byte)
-            x_array.append(x_val)
-            y_array.append(y_val)
-            num += 1
+            if byte < 0:
+                byte = 0
+
+            x_val = i%32 + 1
+            y_val = 24 - i//32
             
+            if byte > (limit):
+                #print(byte)
+                x_array.append(x_val)
+                y_array.append(y_val)
+                num += 1
+                
 
 
-    x_sum = sum(x_array)
-    y_sum = sum(y_array)
+        x_sum = sum(x_array)
+        y_sum = sum(y_array)
 
-    print("num2:", num)
+        print("num2:", num)
 
-    if num > 0:
-        cent_x = x_sum/num
-        cent_y = y_sum/num
-    else:
-        return -1, -1
-    
-    return cent_x, cent_y
+        if num > 0:
+            cent_x = x_sum/num
+            cent_y = y_sum/num
+        else:
+            return -1, -1
+        
+        return cent_x, cent_y
 
 
 
@@ -323,7 +242,7 @@ if __name__ == "__main__":
             second_start = time.ticks_ms()
             image_array = camera.get_bytes(image)
             getbytestime = time.ticks_ms()
-            c_x2, c_y2 = calculate_centroid_bytes(ref_array, image_array, limit = 1)
+            c_x2, c_y2 = camera.calculate_centroid_bytes(ref_array, image_array, limit = 20)
             cbytestime = time.ticks_ms()
             
 
