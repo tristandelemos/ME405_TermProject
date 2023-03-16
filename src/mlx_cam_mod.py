@@ -177,7 +177,10 @@ class MLX_Cam:
 
     def find_angle(self,ref_array, image_array, limit = 20):
 
-        c_x2, c_y2 = camera.calculate_centroid_bytes(ref_array, image_array, limit)
+        c_x2, c_y2 = self.calculate_centroid_bytes(ref_array, image_array, limit)
+        
+        if c_x2 < 0 or c_y2 < 0:
+            return -60, -60
 
         #angle calculation
         cx = 32-c_x2

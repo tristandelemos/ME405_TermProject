@@ -330,7 +330,11 @@ class TaskList:
         #  that priority. 
         self.pri_list = []
 
-
+    def pop(self):
+        
+        self.pri_list.pop()
+        
+        
     def append(self, task):
         """!
         Append a task to the task list. The list will be sorted by task 
