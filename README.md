@@ -7,7 +7,7 @@ We have created a turret that fires a projectile after taking a picture and taki
 
 <div align="center">
   <img src="/hardware1.png" alt="Alt text">
-  <img src="hardware2.png" alt="Alt text">
+  <img src="/hardware2.png" alt="Alt text">
 </div>
 
 
