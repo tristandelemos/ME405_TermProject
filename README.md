@@ -19,7 +19,8 @@ INSERT PHOTO OF TURRET
 A discussion of the results.  How did you test your system?  How well has your system performed in these tests
 
 
-A brief discussion of what you've learned about the project and recommendations for anyone who would like to build upon your work
+A brief discussion of what you've learned about the project and recommendations for anyone who would like to build upon your work:
+I would have the coders look deeper into tasks and see if that would make the system faster than it is now.
 
 Shown below is the FSM for our system.
 
