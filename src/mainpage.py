@@ -8,13 +8,13 @@
   We added functionality to the camera file to create mlx_cam_mod.py, that would obtain the centroid and calcuate the angle at
   which to shoot at.
   The files that move the motors are encoder_driver.py, motor_driver.py and pid_control.py.
-  The file that moves the servo is servo.py.
+  The file that moves the servo is servo.py. t
   
   
   
  
     Here is our State Machine Design
-    \image state_diagram.png
+    \image html state_diagram.png
     \image latex state_diagram.eps "My State Diagram"
   
  
