@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['ser_5fnum_0',['ser_num',['../classtask__share_1_1_queue.html#a6f9d87b116eb16dba0867d3746af9f5f',1,'task_share.Queue.ser_num()'],['../classtask__share_1_1_share.html#a2e8df029af46fbfd44ef0c2e7e8c7af6',1,'task_share.Share.ser_num()']]],
-  ['share_5flist_1',['share_list',['../task__share_8py.html#a75818e5b662453e3723d0f234c85e519',1,'task_share']]]
+  ['task_5flist_0',['task_list',['../cotask_8py.html#a1ccd1a5cba88c1203a9aba73b2af7d51',1,'cotask']]],
+  ['type_5fcode_5fstrings_1',['type_code_strings',['../task__share_8py.html#af5ee68a35f9ce19aef4c4bd4ab7c2679',1,'task_share']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ME 405 Term Project: src/mlx_cam.py File Reference</title>
+<title>ME405 Term Project: src/mlx_cam.py File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,9 +21,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">ME 405 Term Project<span id="projectnumber">&#160;1.3</span>
+   <div id="projectname">ME405 Term Project<span id="projectnumber">&#160;1.4</span>
    </div>
-   <div id="projectbrief">Autonomous Turret</div>
+   <div id="projectbrief">Nerf Turret</div>
   </td>
  </tr>
  </tbody>
@@ -95,9 +95,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a4e7cc7aabe8358e110f15def15e41a15"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mlx__cam_8py.html#a4e7cc7aabe8358e110f15def15e41a15">mlx_cam.calculate_centroid</a> (camera, image)</td></tr>
 <tr class="memdesc:a4e7cc7aabe8358e110f15def15e41a15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates centroid from image.  <br /></td></tr>
 <tr class="separator:a4e7cc7aabe8358e110f15def15e41a15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad552dbb8bae05f2202ace92c917036cf"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mlx__cam_8py.html#ad552dbb8bae05f2202ace92c917036cf">mlx_cam.calculate_centroid_bytes</a> (image_array, scalar=0.8)</td></tr>
-<tr class="memdesc:ad552dbb8bae05f2202ace92c917036cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates centroid from bytearray of points in image.  <br /></td></tr>
-<tr class="separator:ad552dbb8bae05f2202ace92c917036cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c9966ca9201ecb6eacc83e070c0f23e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mlx__cam_8py.html#a4c9966ca9201ecb6eacc83e070c0f23e">mlx_cam.calculate_centroid_bytes</a> (image_array, upper=99, scalar=0.8)</td></tr>
+<tr class="memdesc:a4c9966ca9201ecb6eacc83e070c0f23e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates centroid from bytearray of points in image.  <br /></td></tr>
+<tr class="separator:a4c9966ca9201ecb6eacc83e070c0f23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This file contains a wrapper that facilitates the use of a Melexis MLX90640 thermal infrared camera for general use. </p>
@@ -114,7 +114,11 @@ JR Ridgely Added simplified wrapper class <code>MLX_Cam</code>, January 2023 </d
 <p>There's some test code at the bottom of this file which serves as a beginning example.</p>
 <dl class="section author"><dt>Author</dt><dd>mwerezak Original files, Summer 2022 </dd>
 <dd>
-JR Ridgely Added simplified wrapper class <code>MLX_Cam</code>, January 2023 </dd></dl>
+JR Ridgely Added simplified wrapper class <code>MLX_Cam</code>, January 2023 </dd>
+<dd>
+R Verleur Added byte array operations to improve speed </dd>
+<dd>
+T Spicer Added functions to extract centroid/angle data from byte array </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>(c) 2022 by the authors and released under the GNU Public License, version 3. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="a4e7cc7aabe8358e110f15def15e41a15" name="a4e7cc7aabe8358e110f15def15e41a15"></a>
@@ -154,8 +158,8 @@ JR Ridgely Added simplified wrapper class <code>MLX_Cam</code>, January 2023 </d
 
 </div>
 </div>
-<a id="ad552dbb8bae05f2202ace92c917036cf" name="ad552dbb8bae05f2202ace92c917036cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad552dbb8bae05f2202ace92c917036cf">&#9670;&#160;</a></span>calculate_centroid_bytes()</h2>
+<a id="a4c9966ca9201ecb6eacc83e070c0f23e" name="a4c9966ca9201ecb6eacc83e070c0f23e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c9966ca9201ecb6eacc83e070c0f23e">&#9670;&#160;</a></span>calculate_centroid_bytes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -165,6 +169,12 @@ JR Ridgely Added simplified wrapper class <code>MLX_Cam</code>, January 2023 </d
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>image_array</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>upper</em> = <code>99</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

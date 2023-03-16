@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ME 405 Term Project: mlx_cam.MLX_Cam Class Reference</title>
+<title>ME405 Term Project: mlx_cam.MLX_Cam Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,9 +21,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">ME 405 Term Project<span id="projectnumber">&#160;1.3</span>
+   <div id="projectname">ME405 Term Project<span id="projectnumber">&#160;1.4</span>
    </div>
-   <div id="projectbrief">Autonomous Turret</div>
+   <div id="projectbrief">Nerf Turret</div>
   </td>
  </tr>
  </tbody>
@@ -76,7 +76,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classmlx__cam_1_1_m_l_x___cam-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">mlx_cam.MLX_Cam Class Reference</div></div>
@@ -91,25 +90,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a95105abd546aee6585eb199555c730ba"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlx__cam_1_1_m_l_x___cam.html#a95105abd546aee6585eb199555c730ba">__init__</a> (self, i2c, address=0x33, pattern=ChessPattern, width=NUM_COLS, height=NUM_ROWS)</td></tr>
 <tr class="memdesc:a95105abd546aee6585eb199555c730ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up an MLX90640 camera.  <br /></td></tr>
 <tr class="separator:a95105abd546aee6585eb199555c730ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81414599e49572ccef6b84bf79720c0b"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlx__cam_1_1_m_l_x___cam.html#a81414599e49572ccef6b84bf79720c0b">ascii_image</a> (self, array, pixel=&quot;██&quot;, textcolor=&quot;0;180;0&quot;)</td></tr>
-<tr class="memdesc:a81414599e49572ccef6b84bf79720c0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show low-resolution camera data as shaded pixels on a text screen.  <br /></td></tr>
-<tr class="separator:a81414599e49572ccef6b84bf79720c0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cbed5a475d4f37117356caab5e3b6c8"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlx__cam_1_1_m_l_x___cam.html#a2cbed5a475d4f37117356caab5e3b6c8">ascii_art</a> (self, array)</td></tr>
-<tr class="memdesc:a2cbed5a475d4f37117356caab5e3b6c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show a data array from the IR image as ASCII art.  <br /></td></tr>
-<tr class="separator:a2cbed5a475d4f37117356caab5e3b6c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2adf74abddcae23d14424f52548359f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlx__cam_1_1_m_l_x___cam.html#ae2adf74abddcae23d14424f52548359f">get_csv</a> (self, array, limits=None)</td></tr>
 <tr class="memdesc:ae2adf74abddcae23d14424f52548359f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a string containing image data in CSV format.  <br /></td></tr>
 <tr class="separator:ae2adf74abddcae23d14424f52548359f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bb72d68883cd21e0b3d9559c9faa1dd"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlx__cam_1_1_m_l_x___cam.html#a8bb72d68883cd21e0b3d9559c9faa1dd">get_image</a> (self)</td></tr>
 <tr class="memdesc:a8bb72d68883cd21e0b3d9559c9faa1dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get one image from a MLX90640 camera.  <br /></td></tr>
 <tr class="separator:a8bb72d68883cd21e0b3d9559c9faa1dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
-Static Public Attributes</h2></td></tr>
-<tr class="memitem:ab54cab49d3896537eec5516972c90804"><td class="memItemLeft" align="right" valign="top"><a id="ab54cab49d3896537eec5516972c90804" name="ab54cab49d3896537eec5516972c90804"></a>
-str&#160;</td><td class="memItemRight" valign="bottom"><b>asc</b> = &quot; -.:=+*#%@&quot;</td></tr>
-<tr class="memdesc:ab54cab49d3896537eec5516972c90804"><td class="mdescLeft">&#160;</td><td class="mdescRight">A "standard" set of characters of different densities to make ASCII art. <br /></td></tr>
-<tr class="separator:ab54cab49d3896537eec5516972c90804"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacb4f9dc36c9c183387adf4ebe0677fe"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlx__cam_1_1_m_l_x___cam.html#aacb4f9dc36c9c183387adf4ebe0677fe">get_bytes</a> (self, array, limits=None)</td></tr>
+<tr class="memdesc:aacb4f9dc36c9c183387adf4ebe0677fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a bytes object containing image data.  <br /></td></tr>
+<tr class="separator:aacb4f9dc36c9c183387adf4ebe0677fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -209,50 +198,14 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a2cbed5a475d4f37117356caab5e3b6c8" name="a2cbed5a475d4f37117356caab5e3b6c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2cbed5a475d4f37117356caab5e3b6c8">&#9670;&#160;</a></span>ascii_art()</h2>
+<a id="aacb4f9dc36c9c183387adf4ebe0677fe" name="aacb4f9dc36c9c183387adf4ebe0677fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacb4f9dc36c9c183387adf4ebe0677fe">&#9670;&#160;</a></span>get_bytes()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def mlx_cam.MLX_Cam.ascii_art </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>array</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Show a data array from the IR image as ASCII art. </p>
-<p>Each character is repeated twice so the image isn't squished laterally. A code of "&gt;&lt;" indicates an error, probably caused by a bad pixel in the camera. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">array</td><td>The array to be shown, probably <code>image.v_ir</code> </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a81414599e49572ccef6b84bf79720c0b" name="a81414599e49572ccef6b84bf79720c0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a81414599e49572ccef6b84bf79720c0b">&#9670;&#160;</a></span>ascii_image()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def mlx_cam.MLX_Cam.ascii_image </td>
+          <td class="memname">def mlx_cam.MLX_Cam.get_bytes </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -267,13 +220,7 @@ Protected Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>pixel</em> = <code>&quot;██&quot;</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>textcolor</em> = <code>&quot;0;180;0&quot;</code>&#160;</td>
+          <td class="paramname"><em>limits</em> = <code>None</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -283,15 +230,11 @@ Protected Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Show low-resolution camera data as shaded pixels on a text screen. </p>
-<p>The data is printed as a set of characters in columns for the number of rows in the camera's image size. This function is intended for testing an MLX90640 thermal infrared sensor.</p>
-<p>A pair of extended ACSII filled rectangles is used by default to show each pixel so that the aspect ratio of the display on screens isn't too smushed. Each pixel is colored using ANSI terminal escape codes which work in only some programs such as PuTTY. If shown in simpler terminal programs such as the one used in Thonny, the display just shows a bunch of pixel symbols with no difference in shading (boring).</p>
-<p>A simple auto-brightness scaling is done, setting the lowest brightness of a filled block to 0 and the highest to 255. If there are bad pixels, this can reduce contrast in the rest of the image.</p>
-<p>After the printing is done, character color is reset to a default of medium-brightness green, or something else if chosen. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Generate a bytes object containing image data. </p>
+<p>This function returns a bytes object containing the values for all the pixels in the camera. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">array</td><td>An array of (self._width * self._height) pixel values </td></tr>
-    <tr><td class="paramname">pixel</td><td>Text which is shown for each pixel, default being a pair of extended-ASCII blocks (code 219) </td></tr>
-    <tr><td class="paramname">textcolor</td><td>The color to which printed text is reset when the image has been finished, as a string "&lt;r&gt;;&lt;g&gt;;&lt;b&gt;" with each letter representing the intensity of red, green, and blue from 0 to 255 </td></tr>
+    <tr><td class="paramname">array</td><td>The array of data to be presented </td></tr>
+    <tr><td class="paramname">limits</td><td>A 2-iterable containing the maximum and minimum values to which the data should be scaled, or <code>None</code> for no scaling </td></tr>
   </table>
   </dd>
 </dl>
