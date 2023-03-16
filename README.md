@@ -24,7 +24,7 @@ A discussion of the results.  How did you test your system?  How well has your s
 
 
 A brief discussion of what you've learned about the project and recommendations for anyone who would like to build upon your work:
-We would have the coders look deeper into tasks and see if that would make the system faster than it is now. We would also look into the PID loop and see why the PID loop would not work correctly for us.
+We would have the coders look deeper into tasks and see if that would make the system faster than it is now. We were unable to use taskshare and cotask because the system would not allow that much memory to be on the hardware. We would also look into the PID loop and see why the PID loop would not work correctly for us.
 
 Shown below is the FSM for our system.
 
