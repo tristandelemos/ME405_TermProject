@@ -5,7 +5,10 @@ We have created a turret that fires a projectile after taking a picture and taki
 
 ## Hardware Design Overview
 
-INSERT PHOTO OF TURRET
+<div align="center">
+  <img src="/hardware1.png" alt="Alt text">
+  <img src="hardware2.png" alt="Alt text">
+</div>
 
 
 ## Software Design Overview
@@ -21,11 +24,11 @@ A discussion of the results.  How did you test your system?  How well has your s
 
 
 A brief discussion of what you've learned about the project and recommendations for anyone who would like to build upon your work:
-I would have the coders look deeper into tasks and see if that would make the system faster than it is now.
+We would have the coders look deeper into tasks and see if that would make the system faster than it is now. We would also look into the PID loop and see why the PID loop would not work correctly for us.
 
 Shown below is the FSM for our system.
 
-![alt text](State_Diagram.png)
+![alt text](state_diagram.png)
 
 For the motor task and the take picture task, we have state machines as well.
 
