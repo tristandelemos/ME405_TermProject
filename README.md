@@ -10,8 +10,9 @@ INSERT PHOTO OF TURRET
 
 ## Software Design Overview
 
-
-/* insert link to Doxygen files */
+The software is designed as a finite state machine. The main functionality of the project is in main.py with all other files supporting it.
+The full overview of the software design 
+https://tristandelemos.github.io/ME405_TermProject/
 
 
 ## Discussion of Results
