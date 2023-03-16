@@ -175,7 +175,26 @@ class MLX_Cam:
         return cent_x, cent_y
 
 
+    def find_angle(self,ref_array, image_array, limit = 20):
 
+        c_x2, c_y2 = camera.calculate_centroid_bytes(ref_array, image_array, limit)
+
+        #angle calculation
+        cx = 32-c_x2
+        if (cx) > 16:
+            cx_f = cx-16
+        else:
+            cx_f = -1*(16-cx)
+        if (c_y2) > 12:
+            cy_f = c_y2-12
+        else:
+            cy_f = -1*(12-c_y2)
+        
+        #print(f"cx_f: {cx_f}, cy_f: {cy_f}")
+        x_deg = cx_f * (55/32)
+        y_deg = cy_f * (35/24)
+
+        return x_deg, y_deg
         
 
 
@@ -258,6 +277,12 @@ if __name__ == "__main__":
 
             #print(f"\nCentroid: {c_x}, {c_y}")
             print(f"\nCentroid2: {c_x2}, {c_y2}")
+
+            x_deg, y_deg = camera.find_angle(ref_array, image_array, limit = 20)
+
+            print(f"found angle: {x_deg}, {y_deg}")
+
+
             
             cont = input("continue? y or n ")
             if cont == "n":
