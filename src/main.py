@@ -91,7 +91,7 @@ def turn_around():
     @brief	Turn the yaw axis motor to turn 180 degrees
     """
     # need to find the point to turn 180 degrees
-    con_yaw.set_setpoint(-3000)
+    con_yaw.set_setpoint(-3008)
     con_pitch.set_setpoint(500)
 
     # Read encoder to get an initial value
@@ -213,12 +213,24 @@ def main():
                 print("in state 1")
                 image = cam.get_image()
                 image_array = cam.get_bytes(image)
-                yaw_position, pitch_position = cam.calculate_centroid_bytes(ref_array, image_array,limit = 5)
+                #yaw_position, pitch_position = cam.calculate_centroid_bytes(ref_array, image_array,limit = 5)
+                yaw_angle, pitch_angle = cam.find_angle(ref_array, image_array,limit = 5)
                 
-                print(yaw_position)
-                print(pitch_position)
+                #print(yaw_position)
+                #print(pitch_position)
+                print("yaw angle:", yaw_angle)
+                print("pitch angle:", pitch_angle)
+                
+                if yaw_angle != -60:
+                    yaw_position = round(yaw_angle * (6016/360))
+                    pitch_position = round(pitch_angle * (3609.6/360))
+                    print(yaw_position)
+                    print(pitch_position)
         
-                state = S2_MOVE_MOTORS
+                    state = S2_MOVE_MOTORS
+                else:
+                    state = S1_TAKE_PICTURE
+                
         
             # Move motors to desired angles
             if(state == S2_MOVE_MOTORS):
@@ -291,7 +303,7 @@ if __name__ == "__main__":
     motor_pitch = MotorDriver ( Pin.board.PA10, Pin.board.PB4, Pin.board.PB5,3)
     # Initialize proportional controllers with default values
     con_yaw = PidControl(Kp = 0.15,Ki = 0.0002,Kd = 0.03)
-    con_pitch = PidControl(Kp = 0.15,Ki = 0.0001,Kd = 0.03)
+    con_pitch = PidControl(Kp = 0.15,Ki = 0.0002,Kd = 0.03)
     
     # Create the tasks. If trace is enabled for any task, memory will be
     # allocated for state transition tracing, and the application will run out
