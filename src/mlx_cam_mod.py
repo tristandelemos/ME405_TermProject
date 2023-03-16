@@ -20,6 +20,8 @@ example.
 
 @author mwerezak Original files, Summer 2022
 @author JR Ridgely Added simplified wrapper class @c MLX_Cam, January 2023
+@author R Verleur Added byte array operations to improve speed
+@author T Spicer Added functions to extract centroid/angle data from byte array
 @copyright (c) 2022 by the authors and released under the GNU Public License,
     version 3.
 """
@@ -91,25 +93,23 @@ class MLX_Cam:
         return image
 
 
-    def get_bytes(self, array, limits=None):
+    def get_bytes(self, array):
         """!
         @brief   Generate a bytes object containing image data.
-        @details This function generates a set of lines, each having one row of
-                 image data in Comma Separated Variable format. The lines can
-                 be printed or saved to a file using a @c for loop.
+        @details This function generates a byte array, with each byte representing
+                 a single pixel. By using a byte array we can get all the data at once
+                 without running out of memory and operations can be performed much more
+                 quickly
         @param   array The array of data to be presented
-        @param   limits A 2-iterable containing the maximum and minimum values
-                 to which the data should be scaled, or @c None for no scaling
+        @returns a bytearray of image pixel values (768 bytes)
         """
-        if limits and len(limits) == 2:
-            scale = (limits[1] - limits[0]) / 255#(max(array) - min(array))
-            offset = 0#limits[0] - min(array)
-        else:
+            # Offset the data because it comes in negative
             offset = 128
             scale = 1.0
-            
+        # Allocate memory for byte array to avoid allocating in a loop
         arr = bytearray(32*24)
-        
+        # Iterate through all elements in arr and replace each one with a
+        #  value found from the input array
         for n in range(len(arr)):
             pix = (array[n]*scale+offset)
             arr[n] = int(pix)
@@ -121,38 +121,32 @@ class MLX_Cam:
     def calculate_centroid_bytes(self,ref_array, image_array, limit = 128):
         """!
         @brief   Calculates centroid from bytearray of points in image
-        @details 
+        @details calculates the centroid of the pixels above a limit value in the bytearray from image_array
+                 also recieves a reference array of cold pixels to get rid of any variation caused by camera
+        @param   ref_array A bytearray of image values for a cold wall in order starting at top left pixel 
         @param   image_array A bytearray of image values in order starting at top left pixel
                  Lines are 32 long, there are 24 lines total
-        @param   scalar A float value from (0 to 1) used to determine how high the image values need to be to be
-                 considered a target
+        @param   limit A 8 bit integer value for the lower limit value the camera considers as a warm pixel
         @returns A tuple of x, y values of the centroid position"""
 
+        # Declare arrays
         x_array = bytearray()
         y_array = bytearray()
-
+        # Start points for the data
         x_val = 1
         y_val = 24
-
+        # Number of pixels above the limit temp
         num = 0
-
-        # for byte in image_array:
+        # Go through each element in the array and format by subtracting reference image
         for i in range(len(image_array)):
-            # if x_val == 33:
-            #     x_val = 0
-            #     y_val -= 1
-            # if y_val == 0:
-            #     print("shouldn't get here")
-            #     break
-
             byte = image_array[i] - (ref_array[i]-255)
-            #print(byte)
+
             if byte < 0:
                 byte = 0
-
+            # Recover x and y index from array index
             x_val = i%32 + 1
             y_val = 24 - i//32
-            
+            # compare value to limit and if bigger add element number to x and y array
             if byte > (limit):
                 #print(byte)
                 x_array.append(x_val)
@@ -160,15 +154,17 @@ class MLX_Cam:
                 num += 1
                 
 
-
+        # Sum elements in x and y arrays
         x_sum = sum(x_array)
         y_sum = sum(y_array)
 
-        print("num2:", num)
-
+        print("num:", num)
+        
+        # If some pixels were found calculate centroid
         if num > 0:
             cent_x = x_sum/num
             cent_y = y_sum/num
+        # Otherwise return -1,-1 for an error state
         else:
             return -1, -1
         
@@ -176,23 +172,33 @@ class MLX_Cam:
 
 
     def find_angle(self,ref_array, image_array, limit = 20):
-
+        """!
+        @brief Calculates the angle in the cameras view cone
+        @details Runs calculate centroid to find centerpoint then scales based on the
+                 specified view angles of the camera (55 x 35 degrees)
+        @param   ref_array A bytearray of image values for a cold wall in order starting at top left pixel 
+        @param   image_array A bytearray of image values in order starting at top left pixel
+                 Lines are 32 long, there are 24 lines total
+                 @param   limit A 8 bit integer value for the lower limit value the camera considers as a warm pixel
+        @returns A tuple of pitch yaw angles for movement of the gun  
+        """
+        # Calculate the centroid
         c_x2, c_y2 = self.calculate_centroid_bytes(ref_array, image_array, limit)
-        
+        # If error return an unreasonable value for error detection later
         if c_x2 < 0 or c_y2 < 0:
             return -60, -60
-
-        #angle calculation
-        #cx = 32-c_x2
+        
+        # center reference the image
         cx = c_x2
         cx_f = cx-16
         cy_f = c_y2-12
 
         
-        #print(f"cx_f: {cx_f}, cy_f: {cy_f}")
+        # Calculate angles based on view angle and resolution (assuming a linear scaling for both)
         x_deg = cx_f * (55/32)
         y_deg = cy_f * (35/24)
-
+        
+        # Return the angle
         return x_deg, y_deg
         #return y_deg,x_deg
         
