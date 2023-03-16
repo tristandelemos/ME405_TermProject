@@ -81,10 +81,10 @@ def task_motors(pitch, yaw):
         elif effort_yaw>100:
             effort_yaw = 100
             
-        if effort_pitch<-100:
-            effort_pitch = -100
-        elif effort_pitch>100:
-            effort_pitch = 100
+        if effort_pitch<-80:
+            effort_pitch = -80
+        elif effort_pitch>80:
+            effort_pitch = 80
             
         # Set the motor duty cycle
         motor_yaw.set_duty_cycle(effort_yaw)
@@ -216,8 +216,9 @@ def main():
             # Take picture and find warmest area to shoot at
             if(state == S1_TAKE_PICTURE):
                 # this is how we are going to wait those five seconds
-                utime.sleep(5)
-                print("in state 1")
+                while(utime.ticks_diff(utime.ticks_ms(), start_time) <= 5000):
+                    pass
+                
                 image = cam.get_image()
                 image_array = cam.get_bytes(image)
                 #yaw_position, pitch_position = cam.calculate_centroid_bytes(ref_array, image_array,limit = 5)
@@ -293,6 +294,8 @@ if __name__ == "__main__":
         @details	The classes have to be instantiated here outside of functions
             so that their values can be accessed and changed by any function.
     """
+                
+    start_time = utime.ticks_ms()
     yaw_offset = -50
     pitch_offset = -50
     # Intitialize camera
