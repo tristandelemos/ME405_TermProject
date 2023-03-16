@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ME405 Term Project: My Personal Index Page</title>
+<title>ME405 Term Project: src/mlx_cam_mod.py File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -47,7 +47,6 @@ $(function() {
 /* @license-end */
 </script>
 <div id="main-nav"></div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -69,25 +68,41 @@ $(function() {
 </div>
 </div>
 
-<div><div class="header">
-  <div class="headertitle"><div class="title">My Personal Index Page </div></div>
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">Classes</a>  </div>
+  <div class="headertitle"><div class="title">mlx_cam_mod.py File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="Software_Design"></a>
-Software_Design</h1>
-<p>The main code of our software is in the <a class="el" href="main_8py.html" title="This file contains the state machine which operates the turret.">main.py</a> file. This is where all other classes from the other files are instantiated. This is also where the state diagram of the project is located.</p>
-<p>We added functionality to the camera file to create <a class="el" href="mlx__cam__mod_8py.html" title="RAW VERSION This version uses a stripped down MLX90640 driver which produces only raw data,...">mlx_cam_mod.py</a>, that would obtain the centroid and calcuate the angle at which to shoot at. The files that move the motors are <a class="el" href="encoder__driver_8py.html" title="This file contains a class which allows for interaction with a quadrature encoder.">encoder_driver.py</a>, <a class="el" href="motor__driver_8py.html" title="This file contains a class which allows for control of a motor using the ME405 motor shield for the n...">motor_driver.py</a> and <a class="el" href="pid__control_8py.html" title="This file contains the class which allows for proportional- integral-derivative control of the motor.">pid_control.py</a>. The file that moves the servo is <a class="el" href="servo_8py.html" title="This file contains the class which allows for proportional- integral-derivative control of the motor.">servo.py</a>.</p>
-<p>Here is our State Machine Design </p>
-<h2><a class="anchor" id="Motor"></a>
-State</h2>
-<pre class="fragment">Here is our Motor FSM
-\image html motor_task.png
-</pre><h2><a class="anchor" id="Picture"></a>
-State</h2>
-<pre class="fragment"> Here is our Image FSM
- \image html picture_task.png
-</pre> </div></div><!-- PageDoc -->
-</div><!-- contents -->
+
+<p>RAW VERSION This version uses a stripped down MLX90640 driver which produces only raw data, not calibrated data, in order to save memory.  
+<a href="#details">More...</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlx__cam__mod_1_1_m_l_x___cam.html">mlx_cam_mod.MLX_Cam</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class which wraps an MLX90640 thermal infrared camera driver to make it easier to grab and use an image.  <a href="classmlx__cam__mod_1_1_m_l_x___cam.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>RAW VERSION This version uses a stripped down MLX90640 driver which produces only raw data, not calibrated data, in order to save memory. </p>
+<p>This file contains a wrapper that facilitates the use of a Melexis MLX90640 thermal infrared camera for general use. The wrapper contains a class MLX_Cam whose use is greatly simplified in comparison to that of the base class, <code>class</code> <code>MLX90640</code>, by mwerezak, who has a cool fox avatar, at <code><a href="https://github.com/mwerezak/micropython-mlx90640">https://github.com/mwerezak/micropython-mlx90640</a></code> </p>
+<p>To use this code, upload the directory <code>mlx90640</code> from mwerezak with all its contents to the root directory of your MicroPython device, then copy this file to the root directory of the MicroPython device.</p>
+<p>There's some test code at the bottom of this file which serves as a beginning example.</p>
+<dl class="section author"><dt>Author</dt><dd>mwerezak Original files, Summer 2022 </dd>
+<dd>
+JR Ridgely Added simplified wrapper class <code>MLX_Cam</code>, January 2023 </dd>
+<dd>
+R Verleur Added byte array operations to improve speed </dd>
+<dd>
+T Spicer Added functions to extract centroid/angle data from byte array </dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>(c) 2022 by the authors and released under the GNU Public License, version 3. </dd></dl>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.6

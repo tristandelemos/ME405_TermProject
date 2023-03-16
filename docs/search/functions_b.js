@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['update_0',['update',['../classencoder__driver_1_1_encoder_driver.html#a52ab5524d2e2b6b08cf8a6c1d9680d7e',1,'encoder_driver::EncoderDriver']]]
+  ['task_5fmotors_0',['task_motors',['../main_8py.html#a63dd06dc0c5940048a7ab0f29ea5cbd5',1,'main']]],
+  ['turn_5faround_1',['turn_around',['../main_8py.html#ab5f41cb3872140b7389d2487ce896234',1,'main']]]
 ];

@@ -7,5 +7,6 @@ var searchData=
   ['set_5fkp_4',['set_Kp',['../classpid__control_1_1_pid_control.html#a1552bb1be911c37e7e1d11aec5a63dbb',1,'pid_control.PidControl.set_Kp()'],['../classpro__control_1_1_pro_control.html#a541cc30837cbf1197fec83710f58320a',1,'pro_control.ProControl.set_Kp()']]],
   ['set_5fperiod_5',['set_period',['../classcotask_1_1_task.html#a310e065fb576dff0e23d075c4e83a5f4',1,'cotask::Task']]],
   ['set_5fsetpoint_6',['set_setpoint',['../classpid__control_1_1_pid_control.html#aee1e0d3423b5ff24898e1f6cdf5c3481',1,'pid_control.PidControl.set_setpoint()'],['../classpro__control_1_1_pro_control.html#aef2e846b78376285afca7f49028f8846',1,'pro_control.ProControl.set_setpoint()']]],
-  ['show_5fall_7',['show_all',['../task__share_8py.html#a130cad0bc96d3138e77344ea85586b7c',1,'task_share']]]
+  ['shoot_7',['shoot',['../main_8py.html#a385a65fc876ea0c7de2281d920f11a11',1,'main']]],
+  ['show_5fall_8',['show_all',['../task__share_8py.html#a130cad0bc96d3138e77344ea85586b7c',1,'task_share']]]
 ];

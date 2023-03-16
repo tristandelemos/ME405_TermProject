@@ -12,5 +12,6 @@ var searchData=
   ['set_5fsetpoint_9',['set_setpoint',['../classpid__control_1_1_pid_control.html#aee1e0d3423b5ff24898e1f6cdf5c3481',1,'pid_control.PidControl.set_setpoint()'],['../classpro__control_1_1_pro_control.html#aef2e846b78376285afca7f49028f8846',1,'pro_control.ProControl.set_setpoint()']]],
   ['share_10',['Share',['../classtask__share_1_1_share.html',1,'task_share']]],
   ['share_5flist_11',['share_list',['../task__share_8py.html#a75818e5b662453e3723d0f234c85e519',1,'task_share']]],
-  ['show_5fall_12',['show_all',['../task__share_8py.html#a130cad0bc96d3138e77344ea85586b7c',1,'task_share']]]
+  ['shoot_12',['shoot',['../main_8py.html#a385a65fc876ea0c7de2281d920f11a11',1,'main']]],
+  ['show_5fall_13',['show_all',['../task__share_8py.html#a130cad0bc96d3138e77344ea85586b7c',1,'task_share']]]
 ];

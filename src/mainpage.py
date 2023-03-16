@@ -15,6 +15,7 @@
  
     Here is our State Machine Design
     \image state_diagram.png
+    \image latex state_diagram.eps "My State Diagram"
   
  
   @subsection Motor State 
