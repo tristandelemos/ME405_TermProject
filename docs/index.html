@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.6"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ME 405 Term Project: My Personal Index Page</title>
+<title>ME405 Term Project: My Personal Index Page</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,9 +21,9 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">ME 405 Term Project<span id="projectnumber">&#160;1.3</span>
+   <div id="projectname">ME405 Term Project<span id="projectnumber">&#160;1.4</span>
    </div>
-   <div id="projectbrief">Autonomous Turret</div>
+   <div id="projectbrief">Nerf Turret</div>
   </td>
  </tr>
  </tbody>
@@ -74,10 +74,10 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><h1><a class="anchor" id="Software_Design"></a>
-State Machine</h1>
-<p>Here is our State Machine Design </p><div class="image">
-<img src="State_Diagram.png" alt=""/>
-</div>
+Software_Design</h1>
+<p>The main code of our software is in the main.py file. This is where all other classes from the other files are instantiated. This is also where the state diagram of the project is located.</p>
+<p>We added functionality to the camera file to create mlx_cam_mod.py, that would obtain the centroid and calcuate the angle at which to shoot at. The files that move the motors are <a class="el" href="encoder__driver_8py.html" title="This file contains a class which allows for interaction with a quadrature encoder.">encoder_driver.py</a>, <a class="el" href="motor__driver_8py.html" title="This file contains a class which allows for control of a motor using the ME405 motor shield for the n...">motor_driver.py</a> and <a class="el" href="pid__control_8py.html" title="This file contains the class which allows for proportional- integral-derivative control of the motor.">pid_control.py</a>. The file that moves the servo is <a class="el" href="servo_8py.html" title="This file contains the class which allows for proportional- integral-derivative control of the motor.">servo.py</a>.</p>
+<p>Here is our State Machine Design </p>
 <h2><a class="anchor" id="Motor"></a>
 State</h2>
 <pre class="fragment">Here is our Motor FSM
