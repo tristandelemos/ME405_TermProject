@@ -14,7 +14,7 @@
   
  
     Here is our State Machine Design
-    \image html State_Diagram.png
+    \image state_diagram.png
   
  
   @subsection Motor State 
