@@ -6,8 +6,8 @@ We have created a turret that fires a projectile after taking a picture and taki
 ## Hardware Design Overview
 The hardware was designed around a purchased nerf gun. The gun was disassembled to strip down the weight and size, and a custom clamshell was printed to contain the mechanical components. A clevis was designed to allow for rotation in two axes, and gt2 belts were selected for their low backlash and availability. Tensioners were used to be sure the belts would not slip. The motors were sized to draw the maximum allowable current at stall to be sure that the motor driver was not burned out. A servo was selected for the firing mechanism because of the ease of use and their reliability. The camera was mounted on a toothed device which allows for adjustment in  $5^\{o}$ increments. The device was wired using a breadboard since it needs to be easy to disassemble. 3D printing was selected for manufacturing due to the complicated geometries of the required parts, as well as the low requirements for strength and the low cost.
 <div align="center">
-  <img src="/hardware1.jpg" alt="Alt text">
-  <img src="/hardware2.jpg" alt="Alt text">
+  <img src="src/hardware1.jpg" alt="Alt text">
+  <img src="src/hardware2.jpg" alt="Alt text">
 </div>
 
 
