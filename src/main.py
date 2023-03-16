@@ -26,7 +26,14 @@ S2_MOVE_MOTORS = 2
 S3_SHOOT = 3
 S4_PAUSE = 4
 
-def task_motors():
+state = S0_INIT
+
+def wait():
+    while True:
+        yield
+    
+
+def task_motors(pitch, yaw):
     """!@brief Task which runs the proportional controller to control the yaw motor.
 
     """
@@ -40,6 +47,9 @@ def task_motors():
     start_yaw = utime.ticks_ms()
     start_pitch = utime.ticks_ms()
     
+    con_yaw.set_setpoint(yaw)
+    con_pitch.set_setpoint(pitch)
+    
     while True:
         # Update the read and postion values
         read_yaw,pos_yaw = enc_yaw.update(read_yaw,pos_yaw)
@@ -48,6 +58,17 @@ def task_motors():
         # Calculate effort with pos and neg limits
         effort_yaw = con_yaw.run(pos_yaw)
         effort_pitch = con_pitch.run(pos_pitch)
+        
+        print(con_yaw.err)
+
+        
+        if(abs(con_yaw.err) <= 5 & abs(con_pitch.err) <= 5):
+            motor_yaw.set_duty_cycle(0)
+            motor_pitch.set_duty_cycle(0)
+            #print("popped off")
+            #state = S1_TAKE_PICTURE
+            #cotask.task_list.pop()
+            yield 0
         
         if effort_yaw<-100:
             effort_yaw = -100
@@ -63,7 +84,7 @@ def task_motors():
         motor_yaw.set_duty_cycle(effort_yaw)
         motor_pitch.set_duty_cycle(effort_pitch)
         # Yield and come back at top of while loop in next call
-        yield
+        yield 1
 
 def turn_around():
     """!
@@ -88,7 +109,18 @@ def turn_around():
         # Calculate effort with pos and neg limits
         effort_yaw = con_yaw.run(pos_yaw)
         effort_pitch = con_pitch.run(pos_pitch)
+        print(con_yaw.err)
         
+        # if close enough, go to next state and stop doing this function
+        if(abs(con_yaw.err) <= 5 & abs(con_pitch.err)):
+            motor_yaw.set_duty_cycle(0)
+            motor_pitch.set_duty_cycle(0)
+            #print("popped off")
+            #state = S1_TAKE_PICTURE
+            #cotask.task_list.pop()
+            yield 0
+            
+            
         if effort_yaw<-100:
             effort_yaw = -100
         elif effort_yaw>100:
@@ -102,8 +134,9 @@ def turn_around():
         # Set the motor duty cycle
         motor_yaw.set_duty_cycle(effort_yaw)
         motor_pitch.set_duty_cycle(effort_pitch)
+        
         # Yield and come back at top of while loop in next call
-        yield effort_yaw, effort_yaw
+        yield 1
 
 
 def take_picture(camera):
@@ -148,8 +181,6 @@ def shoot():
     @brief	Fires the turret by moving the servo to set positions.
     @return	
     """
-    ser.set_pos(20)
-    utime.sleep_ms(50)
     ser.set_pos(0)
 
 
@@ -159,69 +190,79 @@ def main():
     pitch_position = 0
     
     state = S0_INIT
-    
+        
     while(True):
         
         try:
-            cotask.task_list.pri_sched()
-            
+            #cotask.task_list.pri_sched()
+            print("in try")
             if(state == S0_INIT):
                 # move yaw motor to turn around
+                x = turn_around()
+                while(next(x) != 0):
+                    utime.sleep_ms(20)
+                    
+                   
+                    
                 state = S1_TAKE_PICTURE
-            
             
             # Take picture and find warmest area to shoot at
             if(state == S1_TAKE_PICTURE):
                 # this is how we are going to wait those five seconds
-                #if(input() == 'y'):
-                #image = cam.get_image()
-                #image_array = cam.get_bytes(image)
-                #yaw_position, pitch_position = cam.calculate_centroid_bytes(ref_array, image_array)
+                utime.sleep(5)
+                print("in state 1")
+                image = cam.get_image()
+                image_array = cam.get_bytes(image)
+                yaw_position, pitch_position = cam.calculate_centroid_bytes(ref_array, image_array,limit = 5)
                 
+                print(yaw_position)
+                print(pitch_position)
         
                 state = S2_MOVE_MOTORS
         
             # Move motors to desired angles
             if(state == S2_MOVE_MOTORS):
+                print("in state 2")
                 #cotask.task_list.append(task2)
+                x = task_motors(pitch_position, yaw_position)
+                while(next(x) != 0):
+                    utime.sleep_ms(20)
+                    
                 
                 state = S3_SHOOT
             
             # activate servo to shoot
             if(state == S3_SHOOT):
-                #shoot()
+                print("fire!")
+                shoot()
     
                 state = S4_PAUSE
        
             # pause to allow for reloading
             if(state == S4_PAUSE):
                 
-                
+                utime.sleep(10)
                 
                 state = S1_TAKE_PICTURE
        
         except KeyboardInterrupt:
             # If there is a keyboard interrupt, turn off the motors
-            motor_1.set_duty_cycle(0)
-            motor_2.set_duty_cycle(0)
-            # Tell the C-Python program that we are done
-            u2.write(b'end\r\n')
+            motor_yaw.set_duty_cycle(0)
+            motor_pitch.set_duty_cycle(0)
             # Print exit statement
             print('Program exited by user')
             # Raise exception to exit out of all loops
             raise Exception('Program Exited by User')
             break
         
-        except:
-            motor_1.set_duty_cycle(0)
-            motor_2.set_duty_cycle(0)
-            # Tell the C-Python program that we are done
-            u2.write(b'end\r\n')
+        #except:
+         #   motor_yaw.set_duty_cycle(0)
+          #  motor_pitch.set_duty_cycle(0)
             # Print exit statement
-            print('Program exited by user')
+           # print('Program exited by user')
             # Raise exception to exit out of all loops
-            raise Exception('Program Exited by User')
-            break
+            #raise Exception('Program Exited by User')
+            #break
 
 if __name__ == "__main__":
     """!@brief	This script creates instances of all the required modules and
@@ -249,7 +290,7 @@ if __name__ == "__main__":
     motor_yaw = MotorDriver ( Pin.board.PC1, Pin.board.PA0, Pin.board.PA1,5)
     motor_pitch = MotorDriver ( Pin.board.PA10, Pin.board.PB4, Pin.board.PB5,3)
     # Initialize proportional controllers with default values
-    con_yaw = PidControl(Kp = 0.15,Ki = 0.0001,Kd = 0.03)
+    con_yaw = PidControl(Kp = 0.15,Ki = 0.0002,Kd = 0.03)
     con_pitch = PidControl(Kp = 0.15,Ki = 0.0001,Kd = 0.03)
     
     # Create the tasks. If trace is enabled for any task, memory will be
@@ -258,18 +299,23 @@ if __name__ == "__main__":
     # debugging and set trace to False when it's not needed
     
     
-    task1 = cotask.Task(turn_around, name="Task_1", priority=1, period=20,
-                        profile=False, trace=False)
-    task2 = cotask.Task(task_motors, name="Task_1", priority=2, period=20,
-                        profile=False, trace=False)
+    #task1 = cotask.Task(turn_around, name="Task_1", priority=3, period=20,
+    #                   profile=False, trace=False)
+    #task2 = cotask.Task(task_motors, name="Task_1", priority=2, period=20,
+    #                   profile=False, trace=False)
+    #taskwait = cotask.Task(wait, name="wait", priority=1, period=1000,
+    #                   profile=False, trace=False)
+    
     
     #task2 = cotask.Task(task2_pitch_motor, name="Task_2", priority=1, period=20,
      #                   profile=False, trace=False)
-    cotask.task_list.append(task1)
+    #cotask.task_list.append(taskwait)
+    #cotask.task_list.append(task1)
     #cotask.task_list.append(task2)
     
     # Create  servo object for firing
     ser = servo.Servo( Pin.board.PB10,2,3)
+    ser.set_pos(20)
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started

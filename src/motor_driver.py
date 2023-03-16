@@ -57,7 +57,7 @@ class MotorDriver:
         @param	level A signed integer holding the duty
                 cycle of the voltage sent to the motor
         """
-        print(f"Setting duty cycle to {level}")
+        #print(f"Setting duty cycle to {level}")
         if level > 0:
             self.en_pin.high()
             self.PWM_1.pulse_width_percent(0)
