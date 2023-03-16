@@ -6,8 +6,8 @@ We have created a turret that fires a projectile after taking a picture and taki
 ## Hardware Design Overview
 
 <div align="center">
-  <img src="/hardware1.HEIC" alt="Alt text">
-  <img src="/hardware2.HEIC" alt="Alt text">
+  <img src="/hardware1.jpg" alt="Alt text">
+  <img src="/hardware2.jpg" alt="Alt text">
 </div>
 
 
@@ -28,9 +28,5 @@ We would have the coders look deeper into tasks and see if that would make the s
 
 Shown below is the FSM for our system.
 
-![alt text](state_diagram.png)
-
 For the motor task and the take picture task, we have state machines as well.
 
-![alt text](motor_task.png)
-![alt text](picture_task.png)
