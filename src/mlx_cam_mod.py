@@ -1,5 +1,5 @@
 """!
-@file mlx_cam.py
+@file mlx_cam_mod.py
 
 RAW VERSION
 This version uses a stripped down MLX90640 driver which produces only raw data,
@@ -103,9 +103,9 @@ class MLX_Cam:
         @param   array The array of data to be presented
         @returns a bytearray of image pixel values (768 bytes)
         """
-            # Offset the data because it comes in negative
-            offset = 128
-            scale = 1.0
+        # Offset the data because it comes in negative
+        offset = 128
+        scale = 1.0
         # Allocate memory for byte array to avoid allocating in a loop
         arr = bytearray(32*24)
         # Iterate through all elements in arr and replace each one with a
