@@ -1,9 +1,12 @@
 # ME405_TermProject
 Created by Tristan de Lemos, Trenten Spicer, Rees Verleur
 
-We have created a turret that fires a projectile after taking a picture and taking aim at the warmest spot from the picture. The purpose of this device is to be able to aim and fire a turret autonomously. It's inteneded use is for security or defense contracting, so that whenever a foreign object is detected the turret will fire.
+We have created a turret that fires a projectile after taking a picture and taking aim at the warmest spot from the picture. The purpose of this device is to be able to aim and fire a turret autonomously. It's intended use is for security or defense contracting, so that whenever a foreign object is detected the turret will fire.
 
 ## Hardware Design Overview
+
+INSERT PHOTO OF TURRET
+
 
 ## Software Design Overview
 
