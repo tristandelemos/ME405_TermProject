@@ -6,8 +6,8 @@ We have created a turret that fires a projectile after taking a picture and taki
 ## Hardware Design Overview
 
 <div align="center">
-  <img src="/hardware1.png" alt="Alt text">
-  <img src="/hardware2.png" alt="Alt text">
+  <img src="/hardware1.HEIC" alt="Alt text">
+  <img src="/hardware2.HEIC" alt="Alt text">
 </div>
 
 
