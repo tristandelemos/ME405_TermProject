@@ -14,7 +14,7 @@
   
  
     Here is our State Machine Design
-    \image html state_diagram.png
+    \image html images/state_diagram.png
     \image latex state_diagram.eps "My State Diagram"
   
  
