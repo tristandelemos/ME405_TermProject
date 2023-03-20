@@ -15,7 +15,7 @@
  
     Here is our State Machine Design
     <div align="center">
-    <img src="images/state_diagram.png" alt="Alt text">
+    <img src="state_diagram.png" alt="Alt text">
     </div>
   
  
