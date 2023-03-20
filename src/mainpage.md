@@ -22,7 +22,7 @@
     Once this state ends, it immediately goes to the next state, S1_TAKE_PICTURE. We pause for five seconds and then take the picture, find the centriod, and find the angle to shot towards. This state will continously take a picture and try to find the centroid until it does find a centroid. Once it has found one, then the state machine will go to the next state. The task diagram for this state can be seen below.
     <br />
 
-    The next state is S2_MOVE_MOTORS. In this state, we take the angle at which the previous state found and move the motors so that the barrel of the turret is aiming at the centroid. This state moves both motors at once so that it can be as fast as possible. Once the error between where we want the motors to be and where the motors actually are is at an absolute value of 5 or less, the state machine moves to the next state. The task diagram for this state can be seen below.
+    The next state is S2_MOVE_MOTORS. In this state, we take the angle at which the previous state found and move the motors so that the barrel of the turret is aiming at the centroid. This state moves both motors at once so that it can be as fast as possible. Once the error between where we want the motors to be and where the motors actually are is at an absolute value of 5 or less, the state machine moves to the next state. For the actual test of the device, we had to increase these values slightly so that there was more chance for the turret to fire. The task diagram for this state can be seen below.
     <br />
 
     The next state is S3_SHOOT. This state moves the servo so that it triggers the firing mechanism mechanically. This state also waits 20 milliseconds and moves the servo back into the previous position. It also sets the motors back to the center position so that we know exactly where the motors are. Once this is over, the state machine transitions to the next state.
@@ -30,7 +30,7 @@
 
     The final state is S4_PAUSE. This state only waits 10 seconds so that we can reload the turret. Once this is over, we return to S1_TAKE_PICTURE.
     <br />
-    
+
 
  
   @subsection S2_MOVE_MOTORS State Task Diagram 
